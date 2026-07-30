@@ -1,6 +1,6 @@
 # Servants of Bharat - Frontend
 
-This branch contains the frontend source code for the **Servants of Bharat** web application.
+This repository contains the frontend source code for the **Servants of Bharat** web application.
 
 ## Tech Stack
 
@@ -8,7 +8,7 @@ This branch contains the frontend source code for the **Servants of Bharat** web
 - Vite
 - React Router
 - Axios
-- CSS / Tailwind CSS
+- Tailwind CSS
 
 ## Prerequisites
 
@@ -18,13 +18,16 @@ This branch contains the frontend source code for the **Servants of Bharat** web
 ## Installation
 
 1. Clone the repository.
-2. Switch to the `dev-frontend` branch.
+
+2. Navigate to the project directory.
 
 ```bash
-git checkout dev-frontend
+cd MAY2026-Team-043/servants-of-india
 ```
 
-3. Install dependencies.
+> If you have already opened the `servants-of-india` folder, skip this step.
+
+3. Install the dependencies.
 
 ```bash
 npm install
@@ -46,10 +49,28 @@ http://localhost:5173
 
 ## Build for Production
 
+Create an optimized production build:
+
 ```bash
 npm run build
 ```
 
+## Project Structure
+
+```
+MAY2026-Team-043/
+├── README.md
+└── servants-of-india/
+    ├── public/
+    ├── src/
+    ├── .env.example
+    ├── package.json
+    ├── vite.config.js
+    ├── tailwind.config.js
+    ├── postcss.config.js
+    └── README.md
+```
+
 ## Project Status
 
-This branch is used for **frontend development**. Features are actively developed and tested before being promoted to the UAT and production branches.
+This project is under active frontend development. Features are implemented, tested, and reviewed before being promoted to the UAT and production branches.
