@@ -101,6 +101,24 @@ http://localhost:5000/api/docs
 http://localhost:5000/api/openapi.json
 ```
 
+### Static Swagger Specification
+
+A standalone Swagger / OpenAPI 3.0 file for the Sprint 1 endpoints (Auth, Users,
+Categories, Events) is checked in at
+[`servants-of-india/docs/swagger-sprint-1.yaml`](servants-of-india/docs/swagger-sprint-1.yaml).
+
+It needs no running server — paste it into [editor.swagger.io](https://editor.swagger.io)
+or open it in any OpenAPI viewer. On top of the standard spec, every operation carries
+two custom extensions:
+
+| Extension | Contents |
+|-----------|----------|
+| `x-user-story` | The user story the endpoint implements |
+| `x-error-handling` | The error cases and status codes that operation returns |
+
+Use the live `/api/docs` endpoint for trying requests against a running server, and this
+file for reviewing the contract offline.
+
 ## Testing
 
 The project has two independent test suites.
@@ -142,6 +160,11 @@ pytest tests/ -k "ownership or status"  # match test names
 `pytest` is already pinned in `requirements.txt`, so step 4 of the installation
 instructions above installs everything the suite needs.
 
+A written test-case log for this suite — every case in
+`[ API, Inputs, Expected output, Actual output, Result ]` form, plus the defects testing
+uncovered and how they were fixed — is at
+[`servants-of-india/docs/sprint-1-testcases.md`](servants-of-india/docs/sprint-1-testcases.md).
+
 ### Performance & Manual API Tests (JMeter)
 
 JMeter test plans, manual test cases, and their execution results live in
@@ -182,6 +205,7 @@ MAY2026-Team-043/
     │   ├── auth/  users/  categories/  events/  submissions/  reviews/
     │   ├── progress/  certificates/  notifications/  admin/   # one blueprint each
     ├── tests/                # pytest API suite (Sprint 1)
+    ├── docs/                 # static swagger yaml + written test-case log
     ├── Jmeter_Tests/         # JMeter plans + manual test cases (see its own README)
     ├── seed.py               # categories + first Super Admin
     ├── requirements.txt
