@@ -8,19 +8,19 @@ All plans target the Flask API at **`http://localhost:5000`**.
 
 ## Prerequisites
 
-| Requirement | Notes |
-|-------------|--------|
+| Requirement            | Notes                                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | **Apache JMeter 5.6+** | [Download JMeter](https://jmeter.apache.org/download_jmeter.cgi). GUI for interactive runs; CLI for CI/automation. |
-| **Python 3.10+** | Used by generator and merge scripts. |
-| **Running backend** | Seed DB and start API before any JMeter run (see [Backend setup](#backend-setup)). |
-| **Java 8+** | Required by JMeter. |
+| **Python 3.10+**       | Used by generator and merge scripts.                                                                               |
+| **Running backend**    | Seed DB and start API before any JMeter run (see [Backend setup](#backend-setup)).                                 |
+| **Java 8+**            | Required by JMeter.                                                                                                |
 
 ### Backend setup
 
 From the repo root:
 
 ```bash
-cd backend
+cd /MAY2026-Team-043/servants-of-india
 python -m venv .venv
 # Windows:  .venv\Scripts\activate
 # macOS/Linux: source .venv/bin/activate
@@ -32,10 +32,10 @@ python -m app.app               # http://localhost:5000
 
 **Seeded admin (used by JMeter scripts):**
 
-| Field | Value |
-|-------|--------|
-| Email | `admin@sob.local` |
-| Password | `Admin@12345` |
+| Field    | Value             |
+| -------- | ----------------- |
+| Email    | `admin@sob.local` |
+| Password | `Admin@12345`     |
 
 Verify: `GET http://localhost:5000/api/health` → `{"success": true, "data": {"status": "ok"}}`
 
@@ -68,29 +68,29 @@ Jmeter_Tests/
 ```
 
 ---
+
 ## JMeter API testing (Servants of Bharat)
 
 **Target**: live Flask API at http://localhost:5000 — requires a running server and a seeded database (python seed.py: 5 categories + Super Admin). Not in-process; hits the real HTTP stack and your configured DB (Postgres via .env).
 
-**Fixtures**: per–thread-group setup via HTTP — login/register steps extract JWTs into JMeter vars (ADMIN_TOKEN, VOL_TOKEN, EM_TOKEN) and reuse them as Authorization: Bearer ${ADMIN_TOKEN}. Dynamic test data uses ${__UUID()} emails; multipart flows attach Testing/JMeter_Scripts/test-image.jpg (or .gif for rejection tests).
+**Fixtures**: per–thread-group setup via HTTP — login/register steps extract JWTs into JMeter vars (ADMIN_TOKEN, VOL_TOKEN, EM_TOKEN) and reuse them as Authorization: Bearer ${ADMIN_TOKEN}. Dynamic test data uses ${\_\_UUID()} emails; multipart flows attach Testing/JMeter_Scripts/test-image.jpg (or .gif for rejection tests).
 
-**Coverage**: four plans — endpoint smoke (Servants_of_Bharat_API.jmx), 72 manual cases (TC-001…072: success + validation + RBAC), 36 positive-only cases, and 28 OpenAPI contract checks (SC-001…028: HTTP status + JSON schema). Each testcase thread group asserts expected status code and body fragments; results land in *_Results.csv and merge to *_Updated.csv via merge_testcase_results.py.
----
+## **Coverage**: four plans — endpoint smoke (Servants_of_Bharat_API.jmx), 72 manual cases (TC-001…072: success + validation + RBAC), 36 positive-only cases, and 28 OpenAPI contract checks (SC-001…028: HTTP status + JSON schema). Each testcase thread group asserts expected status code and body fragments; results land in _\_Results.csv and merge to _\_Updated.csv via merge_testcase_results.py.
 
 ## JMeter test plans (overview)
 
-| JMX file | Purpose | Cases | Results file |
-|----------|---------|-------|----------------|
-| `Servants_of_Bharat_API.jmx` | Quick endpoint smoke — hits each route once | ~35 endpoints | *(View Results Tree only)* |
-| `Servants_of_Bharat_API_TestCases.jmx` | Full functional manual tests — positive **and** negative | 72 (TC-001…072) | `API_Manual_TestCases_Results.csv` |
-| `Servants_of_Bharat_API_Positive_TestCases.jmx` | Happy-path / success scenarios only | 36 | `API_Manual_TestCases_Positive_Usecase_Results.csv` |
-| `Servants_of_Bharat_Swagger_Contract.jmx` | OpenAPI response schema + HTTP status contract | 28 (SC-001…028) | `Swagger_Contract_TestCases_Results.csv` |
+| JMX file                                        | Purpose                                                  | Cases           | Results file                                        |
+| ----------------------------------------------- | -------------------------------------------------------- | --------------- | --------------------------------------------------- |
+| `Servants_of_Bharat_API.jmx`                    | Quick endpoint smoke — hits each route once              | ~35 endpoints   | _(View Results Tree only)_                          |
+| `Servants_of_Bharat_API_TestCases.jmx`          | Full functional manual tests — positive **and** negative | 72 (TC-001…072) | `API_Manual_TestCases_Results.csv`                  |
+| `Servants_of_Bharat_API_Positive_TestCases.jmx` | Happy-path / success scenarios only                      | 36              | `API_Manual_TestCases_Positive_Usecase_Results.csv` |
+| `Servants_of_Bharat_Swagger_Contract.jmx`       | OpenAPI response schema + HTTP status contract           | 28 (SC-001…028) | `Swagger_Contract_TestCases_Results.csv`            |
 
 Each testcase-driven plan uses **one Thread Group per test case**, runs thread groups **serially**, and includes:
 
-1. **Setup** — clears the results CSV header row  
-2. **Test thread groups** — HTTP steps + assertions + result recorder  
-3. **TearDown** — runs the matching Python merge script to produce the `*_Updated.csv` file  
+1. **Setup** — clears the results CSV header row
+2. **Test thread groups** — HTTP steps + assertions + result recorder
+3. **TearDown** — runs the matching Python merge script to produce the `*_Updated.csv` file
 
 ---
 
@@ -127,17 +127,17 @@ Ensure `python` is on your PATH — TearDown merge scripts invoke Python.
 
 All testcase CSVs share the same columns:
 
-| Column | Description |
-|--------|-------------|
-| `TestCaseId` | e.g. `TC-001`, `SC-006` |
-| `Scenario` | Short title |
-| `Steps` | Manual steps (pipe-separated in results) |
-| `Expected` | Expected HTTP status + response behaviour |
-| `Input` | Request body / auth / query summary |
-| `Actual` | `HTTP_CODE \| response body` (body truncated ~1000 chars) |
-| `Status` | `Pass`, `Fail`, or `Not Run` |
-| `Comments` | Notes from source test case |
-| `RunTime` | Sample time in ms |
+| Column       | Description                                               |
+| ------------ | --------------------------------------------------------- |
+| `TestCaseId` | e.g. `TC-001`, `SC-006`                                   |
+| `Scenario`   | Short title                                               |
+| `Steps`      | Manual steps (pipe-separated in results)                  |
+| `Expected`   | Expected HTTP status + response behaviour                 |
+| `Input`      | Request body / auth / query summary                       |
+| `Actual`     | `HTTP_CODE \| response body` (body truncated ~1000 chars) |
+| `Status`     | `Pass`, `Fail`, or `Not Run`                              |
+| `Comments`   | Notes from source test case                               |
+| `RunTime`    | Sample time in ms                                         |
 
 ### Pass / Fail logic (manual suites)
 
@@ -148,7 +148,7 @@ Status is **not** tied to JMeter’s default HTTP success flag (which treats 4xx
 
 Expected 401/422/403 responses therefore Pass when the API returns the correct error — not Fail.
 
-### Swagger contract suite (SC-*)
+### Swagger contract suite (SC-\*)
 
 Each case validates:
 
@@ -176,10 +176,10 @@ Swagger_Contract    Swagger_Contract        Swagger_Contract_        Swagger_Con
 
 ## Test assets
 
-| File | Used by |
-|------|---------|
+| File                            | Used by                                                          |
+| ------------------------------- | ---------------------------------------------------------------- |
 | `JMeter_Scripts/test-image.jpg` | TC-043, SC-017+, certificate/submission flows (multipart upload) |
-| `JMeter_Scripts/test-image.gif` | TC-045 (invalid image extension) |
+| `JMeter_Scripts/test-image.gif` | TC-045 (invalid image extension)                                 |
 
 Paths are embedded as absolute paths when JMX is generated. Re-run the generator if you move the repo.
 
@@ -201,10 +201,10 @@ Current IDs: `TC-001, TC-002, TC-007, TC-011, TC-012, TC-014, TC-016, TC-019, TC
 
 ### Swagger contract suite (SC-001 … SC-028)
 
-- Health, auth, users, events, submissions, certificates, admin, verify  
-- Success schemas (AuthResponse, Event, etc.)  
-- Error schema on 401 / 422  
-- Public verify endpoint  
+- Health, auth, users, events, submissions, certificates, admin, verify
+- Success schemas (AuthResponse, Event, etc.)
+- Error schema on 401 / 422
+- Public verify endpoint
 
 Rules per case are stored in `swagger_validation_rules.json`.
 
@@ -212,4 +212,4 @@ Rules per case are stored in `swagger_validation_rules.json`.
 
 ## Related documentation
 
-- Test suite: `Jmeter_Tests/` 
+- Test suite: `Jmeter_Tests/`
