@@ -1,0 +1,1019 @@
+# Servants of Bharat API - Sprint 1 (Milestone 3). Swagger-compatible OpenAPI 3.0.
+# Subset of openapi.yaml. Includes user-story mapping (x-user-story) and
+# error-handling details (x-error-handling). Validate at https://editor.swagger.io
+
+openapi: 3.0.3
+info:
+  title: Servants of Bharat API — Sprint 1 (Milestone 3)
+  description: Swagger / OpenAPI 3.0 documentation for the Sprint 1 endpoints (Auth, Users, Categories,
+    Events - the first ~50% of the platform APIs). Every operation includes its mapped user story and
+    error-handling details.
+  version: 1.0.0
+servers:
+- url: /api
+  description: Local API base path
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: 'Forbidden: insufficient role'
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+            user:
+              $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        organization:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum:
+          - volunteer
+          - event_manager
+          - super_admin
+        status:
+          type: string
+          enum:
+          - active
+          - blocked
+          - deactivated
+        created_at:
+          type: string
+          format: date-time
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          example: tree-plantation-a1b2c3d4
+        title:
+          type: string
+        description:
+          type: string
+        category_id:
+          type: string
+          format: uuid
+        category_name:
+          type: string
+        venue:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        event_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          example: 09:00
+        end_time:
+          type: string
+          example: '13:00'
+        capacity:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum:
+          - upcoming
+          - completed
+          - cancelled
+        created_by:
+          type: string
+          format: uuid
+        created_by_name:
+          type: string
+    EventInput:
+      type: object
+      required:
+      - title
+      - description
+      - category_id
+      - venue
+      - address
+      - city
+      - state
+      - event_date
+      - start_time
+      - end_time
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category_id:
+          type: string
+          format: uuid
+        venue:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        event_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          example: 09:00
+        end_time:
+          type: string
+          example: '13:00'
+        capacity:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum:
+          - upcoming
+          - completed
+          - cancelled
+    Submission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        volunteer_id:
+          type: string
+          format: uuid
+        volunteer_name:
+          type: string
+        category_id:
+          type: string
+          format: uuid
+        category_name:
+          type: string
+        event_id:
+          type: string
+          format: uuid
+          nullable: true
+        event_title:
+          type: string
+          nullable: true
+        image_url:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - rejected
+        submitted_at:
+          type: string
+          format: date-time
+    Certificate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        volunteer_id:
+          type: string
+          format: uuid
+        volunteer_name:
+          type: string
+        certificate_number:
+          type: string
+          example: SOB-2026-00001
+        verification_code:
+          type: string
+        pdf_url:
+          type: string
+        issued_at:
+          type: string
+          format: date-time
+    Progress:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+        completed_count:
+          type: integer
+        total_categories:
+          type: integer
+        stars:
+          type: integer
+        all_completed:
+          type: boolean
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - approval
+          - rejection
+          - certificate
+          - system
+        message:
+          type: string
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+tags:
+- name: Auth
+  description: Registration & login
+- name: Users
+  description: Profile & Super Admin user management
+- name: Categories
+  description: Fixed service categories (read-only)
+- name: Events
+  description: Event CRUD with ownership checks
+paths:
+  /auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Volunteer self-registration
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/AuthResponse'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - full_name
+              - email
+              - password
+              - phone
+              - location
+              properties:
+                full_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                  minLength: 8
+                phone:
+                  type: string
+                location:
+                  type: string
+                organization:
+                  type: string
+      x-user-story: As a volunteer, I want to self-register with my details so that I can join the platform.
+      x-error-handling:
+      - 422 - missing/invalid fields (name, email, password<8, phone, location)
+      - 409 - email already registered
+      description: 'Volunteer self-registration
+
+
+        **User story:** As a volunteer, I want to self-register with my details so that I can join the
+        platform.
+
+
+        **Error handling:**
+
+        - 422 - missing/invalid fields (name, email, password<8, phone, location)
+
+        - 409 - email already registered'
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login and receive a JWT
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Blocked/deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      x-user-story: As any user, I want to log in securely so that my account is protected.
+      x-error-handling:
+      - 401 - invalid email or password
+      - 403 - account blocked or deactivated
+      description: 'Login and receive a JWT
+
+
+        **User story:** As any user, I want to log in securely so that my account is protected.
+
+
+        **Error handling:**
+
+        - 401 - invalid email or password
+
+        - 403 - account blocked or deactivated'
+  /auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Logout (client discards token)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      x-user-story: As any user, I want to log out so that my session ends safely.
+      x-error-handling:
+      - 200 - always succeeds (stateless)
+      description: 'Logout (client discards token)
+
+
+        **User story:** As any user, I want to log out so that my session ends safely.
+
+
+        **Error handling:**
+
+        - 200 - always succeeds (stateless)'
+  /users/me:
+    get:
+      tags:
+      - Users
+      summary: Get current profile
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401': &id001
+          description: Missing/invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403': &id002
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - bearerAuth: []
+      x-user-story: As any user, I want to view my profile so that I can see my current details.
+      x-error-handling:
+      - 401 - missing or invalid JWT
+      description: 'Get current profile
+
+
+        **User story:** As any user, I want to view my profile so that I can see my current details.
+
+
+        **Error handling:**
+
+        - 401 - missing or invalid JWT'
+    put:
+      tags:
+      - Users
+      summary: Update own profile (email immutable)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      x-user-story: As any user, I want to update my profile so that my details stay current.
+      x-error-handling:
+      - 401 - not authenticated
+      - 422 - full_name cannot be empty
+      description: 'Update own profile (email immutable)
+
+
+        **User story:** As any user, I want to update my profile so that my details stay current.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated
+
+        - 422 - full_name cannot be empty'
+  /users/me/password:
+    put:
+      tags:
+      - Users
+      summary: Change own password (stays logged in)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: Current password incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: New password too short
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - current_password
+              - new_password
+              properties:
+                current_password:
+                  type: string
+                new_password:
+                  type: string
+                  minLength: 8
+      x-user-story: As any user, I want to change my password securely so that my account stays safe.
+      x-error-handling:
+      - 400 - current password incorrect (does NOT log the user out)
+      - 422 - new password shorter than 8 characters
+      - 401 - not authenticated
+      description: 'Change own password (stays logged in)
+
+
+        **User story:** As any user, I want to change my password securely so that my account stays safe.
+
+
+        **Error handling:**
+
+        - 400 - current password incorrect (does NOT log the user out)
+
+        - 422 - new password shorter than 8 characters
+
+        - 401 - not authenticated'
+  /users:
+    get:
+      tags:
+      - Users
+      summary: List all users (Super Admin)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: role
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+      x-user-story: As a super admin, I want to list and filter all users so that I can administer accounts.
+      x-error-handling:
+      - 401 - not authenticated
+      - 403 - caller is not a Super Admin
+      description: 'List all users (Super Admin)
+
+
+        **User story:** As a super admin, I want to list and filter all users so that I can administer
+        accounts.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated
+
+        - 403 - caller is not a Super Admin'
+    post:
+      tags:
+      - Users
+      summary: Create Event Manager / Super Admin (Super Admin)
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - full_name
+              - email
+              - password
+              - role
+              properties:
+                full_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                  - event_manager
+                  - super_admin
+                phone:
+                  type: string
+                location:
+                  type: string
+                organization:
+                  type: string
+      x-user-story: As a super admin, I want to create Event Manager / Super Admin accounts so that the
+        platform can be staffed.
+      x-error-handling:
+      - 422 - validation error (EM requires organization, phone, location)
+      - 409 - email already registered
+      - 403 - caller is not a Super Admin
+      description: 'Create Event Manager / Super Admin (Super Admin)
+
+
+        **User story:** As a super admin, I want to create Event Manager / Super Admin accounts so that
+        the platform can be staffed.
+
+
+        **Error handling:**
+
+        - 422 - validation error (EM requires organization, phone, location)
+
+        - 409 - email already registered
+
+        - 403 - caller is not a Super Admin'
+  /users/{id}/status:
+    patch:
+      tags:
+      - Users
+      summary: Change user status (Super Admin)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - active
+                  - blocked
+                  - deactivated
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As a super admin, I want to block / unblock / deactivate users so that I control access.
+      x-error-handling:
+      - 400 - cannot change your own status
+      - 422 - invalid status value
+      - 404 - user not found
+      - 403 - caller is not a Super Admin
+      description: 'Change user status (Super Admin)
+
+
+        **User story:** As a super admin, I want to block / unblock / deactivate users so that I control
+        access.
+
+
+        **Error handling:**
+
+        - 400 - cannot change your own status
+
+        - 422 - invalid status value
+
+        - 404 - user not found
+
+        - 403 - caller is not a Super Admin'
+  /categories:
+    get:
+      tags:
+      - Categories
+      summary: List the 5 fixed service categories
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      security:
+      - bearerAuth: []
+      x-user-story: As any user, I want to see the five service categories so that I know where I can
+        serve.
+      x-error-handling:
+      - 401 - not authenticated
+      description: 'List the 5 fixed service categories
+
+
+        **User story:** As any user, I want to see the five service categories so that I know where I
+        can serve.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated'
+  /events:
+    get:
+      tags:
+      - Events
+      summary: List events
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: category
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+      x-user-story: As any user, I want to browse events so that I can decide where to serve.
+      x-error-handling:
+      - 401 - not authenticated
+      description: 'List events
+
+
+        **User story:** As any user, I want to browse events so that I can decide where to serve.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated'
+    post:
+      tags:
+      - Events
+      summary: Create event (Event Manager / Super Admin)
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventInput'
+      x-user-story: As an event manager, I want to create events so that I can run service activities.
+      x-error-handling:
+      - 422 - missing required fields or invalid category_id
+      - 403 - caller is not an Event Manager / Super Admin
+      - 401 - not authenticated
+      description: 'Create event (Event Manager / Super Admin)
+
+
+        **User story:** As an event manager, I want to create events so that I can run service activities.
+
+
+        **Error handling:**
+
+        - 422 - missing required fields or invalid category_id
+
+        - 403 - caller is not an Event Manager / Super Admin
+
+        - 401 - not authenticated'
+  /events/{identifier}:
+    get:
+      tags:
+      - Events
+      summary: Get event by UUID or slug
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: identifier
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As any user, I want to view an event's details so that I can learn more about it.
+      x-error-handling:
+      - 404 - event not found
+      - 401 - not authenticated
+      description: 'Get event by UUID or slug
+
+
+        **User story:** As any user, I want to view an event''s details so that I can learn more about
+        it.
+
+
+        **Error handling:**
+
+        - 404 - event not found
+
+        - 401 - not authenticated'
+    put:
+      tags:
+      - Events
+      summary: Update event (creator or Super Admin)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '403': *id002
+        '401': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventInput'
+      parameters:
+      - name: identifier
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As an event manager, I want to edit my own events so that I can keep them accurate.
+      x-error-handling:
+      - 403 - not the event's creator (and not Super Admin)
+      - 404 - event not found
+      - 422 - invalid field/category
+      description: 'Update event (creator or Super Admin)
+
+
+        **User story:** As an event manager, I want to edit my own events so that I can keep them accurate.
+
+
+        **Error handling:**
+
+        - 403 - not the event''s creator (and not Super Admin)
+
+        - 404 - event not found
+
+        - 422 - invalid field/category'
+    delete:
+      tags:
+      - Events
+      summary: Delete event (creator or Super Admin)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '403': *id002
+        '401': *id001
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: identifier
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As an event manager, I want to delete my own events so that I can remove cancelled
+        ones.
+      x-error-handling:
+      - 403 - not the event's creator (and not Super Admin)
+      - 404 - event not found
+      description: 'Delete event (creator or Super Admin)
+
+
+        **User story:** As an event manager, I want to delete my own events so that I can remove cancelled
+        ones.
+
+
+        **Error handling:**
+
+        - 403 - not the event''s creator (and not Super Admin)
+
+        - 404 - event not found'
