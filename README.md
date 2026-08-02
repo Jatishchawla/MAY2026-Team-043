@@ -101,6 +101,58 @@ http://localhost:5000/api/docs
 http://localhost:5000/api/openapi.json
 ```
 
+## Testing
+
+The project has two independent test suites.
+
+### Automated API Tests (pytest)
+
+The `servants-of-india/tests/` folder holds the automated Sprint 1 API suite — 41 tests
+covering authentication, user management, service categories, and event CRUD with
+ownership rules.
+
+Each run builds the Flask app against a throwaway SQLite database seeded with the five
+service categories and one Super Admin, so the suite is self-contained: no running
+server, no Supabase credentials, and no effect on your development database.
+
+Run from the `servants-of-india` directory (the fixtures import the `app` package, so
+the working directory matters):
+
+```bash
+cd MAY2026-Team-043/servants-of-india
+pytest tests/
+```
+
+Useful variations:
+
+```bash
+pytest tests/ -v                        # one line per test
+pytest tests/test_sprint1_auth.py       # a single file
+pytest tests/ -k "ownership or status"  # match test names
+```
+
+| File | Covers |
+|------|--------|
+| `tests/conftest.py` | Shared fixtures: temp-DB app, test client, user factory, JWT auth headers |
+| `tests/test_sprint1_auth.py` | Registration validation, login, blocked accounts, logout |
+| `tests/test_sprint1_users.py` | Profile read/update, password change, admin user management, status changes |
+| `tests/test_sprint1_categories.py` | Read-only category listing and its auth requirement |
+| `tests/test_sprint1_events.py` | Event create/list/get by id and slug, update, delete, ownership enforcement |
+
+`pytest` is already pinned in `requirements.txt`, so step 4 of the installation
+instructions above installs everything the suite needs.
+
+### Performance & Manual API Tests (JMeter)
+
+JMeter test plans, manual test cases, and their execution results live in
+`servants-of-india/Jmeter_Tests/`. That folder has its own documentation — see
+[`Jmeter_Tests/API_TESTING_EXECUTION_PLAN.md`](servants-of-india/Jmeter_Tests/API_TESTING_EXECUTION_PLAN.md)
+for prerequisites, backend setup, and how to run the plans from either the JMeter GUI or
+the command line.
+
+Unlike the pytest suite, the JMeter plans run against a live server, so the backend must
+be seeded and started first.
+
 ## Environment Variables
 
 | Variable | Description |
@@ -129,6 +181,8 @@ MAY2026-Team-043/
     │   ├── docs/            # OpenAPI 3 spec + Swagger UI wiring
     │   ├── auth/  users/  categories/  events/  submissions/  reviews/
     │   ├── progress/  certificates/  notifications/  admin/   # one blueprint each
+    ├── tests/                # pytest API suite (Sprint 1)
+    ├── Jmeter_Tests/         # JMeter plans + manual test cases (see its own README)
     ├── seed.py               # categories + first Super Admin
     ├── requirements.txt
     └── .env.example
@@ -146,6 +200,7 @@ MAY2026-Team-043/
 - Certificate Verification
 - Notifications
 - Swagger API Documentation
+- Automated API Test Suite (pytest) & JMeter Performance Tests
 
 ## Project Status
 
