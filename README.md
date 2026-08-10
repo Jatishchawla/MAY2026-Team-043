@@ -103,9 +103,10 @@ http://localhost:5000/api/openapi.json
 
 ### Static Swagger Specification
 
-A standalone Swagger / OpenAPI 3.0 file for the Sprint 1 endpoints (Auth, Users,
-Categories, Events) is checked in at
-[`servants-of-india/docs/swagger-sprint-1.yaml`](servants-of-india/docs/swagger-sprint-1.yaml).
+A standalone Swagger / OpenAPI 3.0 file covering every endpoint on the platform
+(Auth, Users, Categories, Events, Submissions, Reviews, Progress, Certificates,
+Notifications, Admin) is checked in at
+[`servants-of-india/docs/openapi.swagger.yaml`](servants-of-india/docs/openapi.swagger.yaml).
 
 It needs no running server — paste it into [editor.swagger.io](https://editor.swagger.io)
 or open it in any OpenAPI viewer. On top of the standard spec, every operation carries

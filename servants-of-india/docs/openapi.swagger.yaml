@@ -1,13 +1,12 @@
-# Servants of Bharat API - Sprint 1 (Milestone 3). Swagger-compatible OpenAPI 3.0.
-# Subset of openapi.yaml. Includes user-story mapping (x-user-story) and
+# Servants of Bharat API - Complete OpenAPI 3.0 specification (ALL APIs created).
+# Every endpoint includes: description, user-story mapping (x-user-story) and
 # error-handling details (x-error-handling). Validate at https://editor.swagger.io
 
 openapi: 3.0.3
 info:
-  title: Servants of Bharat API — Sprint 1 (Milestone 3)
-  description: Swagger / OpenAPI 3.0 documentation for the Sprint 1 endpoints (Auth, Users, Categories,
-    Events - the first ~50% of the platform APIs). Every operation includes its mapped user story and
-    error-handling details.
+  title: Servants of Bharat API — Complete (All APIs)
+  description: Swagger / OpenAPI 3.0 documentation for ALL APIs created for the Servants of Bharat platform.
+    Every operation includes its mapped user story (x-user-story) and error-handling details (x-error-handling).
   version: 1.0.0
 servers:
 - url: /api
@@ -272,6 +271,18 @@ tags:
   description: Fixed service categories (read-only)
 - name: Events
   description: Event CRUD with ownership checks
+- name: Submissions
+  description: Proof submissions & review queue
+- name: Reviews
+  description: Approve / reject submissions
+- name: Progress
+  description: Volunteer category progress
+- name: Certificates
+  description: Certificate generation & public verify
+- name: Notifications
+  description: In-app notifications
+- name: Admin
+  description: Dashboard statistics
 paths:
   /auth/register:
     post:
@@ -1017,3 +1028,680 @@ paths:
         - 403 - not the event''s creator (and not Super Admin)
 
         - 404 - event not found'
+  /submissions:
+    get:
+      tags:
+      - Submissions
+      summary: Review queue (Event Manager sees own events only)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      x-user-story: As an event manager, I want to see the review queue of proofs for my events so that
+        I can verify volunteer work.
+      x-error-handling:
+      - 401 - not authenticated
+      - 403 - caller is not an Event Manager / Super Admin
+      description: 'Review queue (Event Manager sees own events only)
+
+
+        **User story:** As an event manager, I want to see the review queue of proofs for my events so
+        that I can verify volunteer work.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated
+
+        - 403 - caller is not an Event Manager / Super Admin'
+    post:
+      tags:
+      - Submissions
+      summary: Create proof submission (Volunteer, multipart)
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - category_id
+              - description
+              - image
+              properties:
+                category_id:
+                  type: string
+                description:
+                  type: string
+                event_id:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Submission'
+        '409':
+          description: Duplicate/completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+        '403': *id002
+      x-user-story: As a volunteer, I want to submit proof of service for a completed event so that my
+        work can be verified.
+      x-error-handling:
+      - 422 - missing category_id/description/image
+      - 409 - already approved or a pending submission exists for this category
+      - 413 - image larger than 5 MB
+      - 401 - not authenticated
+      description: 'Create proof submission (Volunteer, multipart)
+
+
+        **User story:** As a volunteer, I want to submit proof of service for a completed event so that
+        my work can be verified.
+
+
+        **Error handling:**
+
+        - 422 - missing category_id/description/image
+
+        - 409 - already approved or a pending submission exists for this category
+
+        - 413 - image larger than 5 MB
+
+        - 401 - not authenticated'
+  /submissions/me:
+    get:
+      tags:
+      - Submissions
+      summary: My submissions (Volunteer)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      security:
+      - bearerAuth: []
+      x-user-story: As a volunteer, I want to see my submissions and their status so that I can track
+        my progress.
+      x-error-handling:
+      - 401 - not authenticated
+      - 403 - caller is not a Volunteer
+      description: 'My submissions (Volunteer)
+
+
+        **User story:** As a volunteer, I want to see my submissions and their status so that I can track
+        my progress.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated
+
+        - 403 - caller is not a Volunteer'
+  /submissions/{id}:
+    get:
+      tags:
+      - Submissions
+      summary: Get a submission
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Submission'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As a reviewer or owner, I want to view a submission's details so that I can assess
+        it.
+      x-error-handling:
+      - 404 - submission not found
+      - 403 - not the owner or a reviewer
+      - 401 - not authenticated
+      description: 'Get a submission
+
+
+        **User story:** As a reviewer or owner, I want to view a submission''s details so that I can assess
+        it.
+
+
+        **Error handling:**
+
+        - 404 - submission not found
+
+        - 403 - not the owner or a reviewer
+
+        - 401 - not authenticated'
+  /submissions/{id}/approve:
+    post:
+      tags:
+      - Reviews
+      summary: Approve a submission (own event for EM)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Submission'
+        '403': *id002
+        '409':
+          description: Already reviewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                remarks:
+                  type: string
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As an event manager, I want to approve a valid proof for my event so that the volunteer
+        earns credit.
+      x-error-handling:
+      - 404 - submission not found
+      - 409 - already reviewed
+      - 403 - not your event / insufficient role
+      - 401 - not authenticated
+      description: 'Approve a submission (own event for EM)
+
+
+        **User story:** As an event manager, I want to approve a valid proof for my event so that the
+        volunteer earns credit.
+
+
+        **Error handling:**
+
+        - 404 - submission not found
+
+        - 409 - already reviewed
+
+        - 403 - not your event / insufficient role
+
+        - 401 - not authenticated'
+  /submissions/{id}/reject:
+    post:
+      tags:
+      - Reviews
+      summary: Reject a submission (own event for EM, remarks required)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Submission'
+        '403': *id002
+        '422':
+          description: Remarks required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - remarks
+              properties:
+                remarks:
+                  type: string
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As an event manager, I want to reject an invalid proof with remarks so that the volunteer
+        can resubmit.
+      x-error-handling:
+      - 422 - remarks are required
+      - 404 - submission not found
+      - 409 - already reviewed
+      - 403 - not your event / insufficient role
+      description: 'Reject a submission (own event for EM, remarks required)
+
+
+        **User story:** As an event manager, I want to reject an invalid proof with remarks so that the
+        volunteer can resubmit.
+
+
+        **Error handling:**
+
+        - 422 - remarks are required
+
+        - 404 - submission not found
+
+        - 409 - already reviewed
+
+        - 403 - not your event / insufficient role'
+  /progress/me:
+    get:
+      tags:
+      - Progress
+      summary: My 5-category progress + star count
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Progress'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      x-user-story: As a volunteer, I want to see my progress across the five categories so that I know
+        what remains.
+      x-error-handling:
+      - 401 - not authenticated
+      - 403 - caller is not a Volunteer
+      description: 'My 5-category progress + star count
+
+
+        **User story:** As a volunteer, I want to see my progress across the five categories so that I
+        know what remains.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated
+
+        - 403 - caller is not a Volunteer'
+  /certificates/generate:
+    post:
+      tags:
+      - Certificates
+      summary: Generate my certificate (idempotent)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Certificate'
+        '400':
+          description: Not all categories completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      x-user-story: As a volunteer, I want to generate my certificate once all five categories are complete
+        so that I have proof of service.
+      x-error-handling:
+      - 400 - all five categories must be completed first
+      - 401 - not authenticated
+      - 403 - caller is not a Volunteer
+      description: 'Generate my certificate (idempotent)
+
+
+        **User story:** As a volunteer, I want to generate my certificate once all five categories are
+        complete so that I have proof of service.
+
+
+        **Error handling:**
+
+        - 400 - all five categories must be completed first
+
+        - 401 - not authenticated
+
+        - 403 - caller is not a Volunteer'
+  /certificates/me:
+    get:
+      tags:
+      - Certificates
+      summary: Get my certificate
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Certificate'
+        '404':
+          description: No certificate yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      x-user-story: As a volunteer, I want to view my certificate so that I can download it.
+      x-error-handling:
+      - 404 - no certificate issued yet
+      - 401 - not authenticated
+      - 403 - caller is not a Volunteer
+      description: 'Get my certificate
+
+
+        **User story:** As a volunteer, I want to view my certificate so that I can download it.
+
+
+        **Error handling:**
+
+        - 404 - no certificate issued yet
+
+        - 401 - not authenticated
+
+        - 403 - caller is not a Volunteer'
+  /certificates:
+    get:
+      tags:
+      - Certificates
+      summary: List all certificates (Super Admin)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      x-user-story: As a super admin, I want the record of all issued certificates so that I can audit
+        recognition.
+      x-error-handling:
+      - 401 - not authenticated
+      - 403 - caller is not a Super Admin
+      description: 'List all certificates (Super Admin)
+
+
+        **User story:** As a super admin, I want the record of all issued certificates so that I can audit
+        recognition.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated
+
+        - 403 - caller is not a Super Admin'
+  /certificates/{id}/download:
+    get:
+      tags:
+      - Certificates
+      summary: Get certificate download URL
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As a certificate holder, I want a download link so that I can save my certificate.
+      x-error-handling:
+      - 404 - certificate not found
+      - 403 - not the owner (volunteers)
+      - 401 - not authenticated
+      description: 'Get certificate download URL
+
+
+        **User story:** As a certificate holder, I want a download link so that I can save my certificate.
+
+
+        **Error handling:**
+
+        - 404 - certificate not found
+
+        - 403 - not the owner (volunteers)
+
+        - 401 - not authenticated'
+  /verify/{verification_code}:
+    get:
+      tags:
+      - Certificates
+      summary: 'PUBLIC: verify a certificate'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      parameters:
+      - name: verification_code
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As anyone (no login), I want to verify a certificate by its code so that I can trust
+        it is genuine.
+      x-error-handling:
+      - 200 - always returns {valid:true/false}; public, no auth required
+      description: 'PUBLIC: verify a certificate
+
+
+        **User story:** As anyone (no login), I want to verify a certificate by its code so that I can
+        trust it is genuine.
+
+
+        **Error handling:**
+
+        - 200 - always returns {valid:true/false}; public, no auth required'
+  /notifications:
+    get:
+      tags:
+      - Notifications
+      summary: My notifications
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      security:
+      - bearerAuth: []
+      x-user-story: As any user, I want to see my notifications so that I stay informed.
+      x-error-handling:
+      - 401 - not authenticated
+      description: 'My notifications
+
+
+        **User story:** As any user, I want to see my notifications so that I stay informed.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated'
+  /notifications/{id}/read:
+    patch:
+      tags:
+      - Notifications
+      summary: Mark a notification read
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      x-user-story: As any user, I want to mark a notification as read so that I can manage my inbox.
+      x-error-handling:
+      - 404 - notification not found or not owned by caller
+      - 401 - not authenticated
+      description: 'Mark a notification read
+
+
+        **User story:** As any user, I want to mark a notification as read so that I can manage my inbox.
+
+
+        **Error handling:**
+
+        - 404 - notification not found or not owned by caller
+
+        - 401 - not authenticated'
+  /admin/stats:
+    get:
+      tags:
+      - Admin
+      summary: Dashboard statistics (scoped by role)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401': *id001
+        '403': *id002
+      security:
+      - bearerAuth: []
+      x-user-story: As an admin or manager, I want dashboard statistics so that I can monitor activity.
+      x-error-handling:
+      - 401 - not authenticated
+      - 403 - caller is not an Event Manager / Super Admin
+      description: 'Dashboard statistics (scoped by role)
+
+
+        **User story:** As an admin or manager, I want dashboard statistics so that I can monitor activity.
+
+
+        **Error handling:**
+
+        - 401 - not authenticated
+
+        - 403 - caller is not an Event Manager / Super Admin'
