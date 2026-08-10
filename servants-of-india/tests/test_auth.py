@@ -1,4 +1,4 @@
-"""Sprint 1 — Auth API tests: register, login, logout."""
+"""Auth API tests: register, login, logout."""
 
 
 def _valid_registration(**over):
