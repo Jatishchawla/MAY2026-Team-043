@@ -1,4 +1,4 @@
-"""Sprint 1 — Users API tests: profile, password, admin user management."""
+"""Users API tests: profile, password, admin user management."""
 
 
 # ---------------------------------------------------------------- /users/me

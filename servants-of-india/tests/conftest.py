@@ -90,3 +90,49 @@ def auth(token):
     def _auth(email, password=None):
         return {"Authorization": f"Bearer {token(email, password)}"}
     return _auth
+
+
+# ------------------------------------------------------------------ Sprint 2 helpers
+@pytest.fixture()
+def cat_ids(client, auth):
+    """List of the five seeded service-category ids."""
+    res = client.get("/api/categories", headers=auth("admin@sob.local"))
+    return [c["id"] for c in res.get_json()["data"]]
+
+
+@pytest.fixture()
+def make_event(client, auth):
+    """Factory: create an event owned by `owner_email` and return the event dict."""
+    def _make(owner_email, category_id, status="completed", **over):
+        body = {
+            "title": over.get("title", "Service Event"),
+            "description": "An event for testing.",
+            "category_id": category_id,
+            "venue": "Venue", "address": "Address", "city": "Pune", "state": "Maharashtra",
+            "event_date": "2026-05-01", "start_time": "09:00", "end_time": "12:00",
+            "capacity": 50, "status": status,
+        }
+        body.update(over)
+        res = client.post("/api/events", headers=auth(owner_email), json=body)
+        return res.get_json()["data"]
+    return _make
+
+
+@pytest.fixture()
+def submit_proof(client, auth):
+    """Factory: a volunteer submits proof (multipart). Returns the raw response."""
+    import io
+
+    def _submit(volunteer_email, category_id, event_id=None, description="Completed the service work."):
+        data = {
+            "category_id": category_id,
+            "description": description,
+            "image": (io.BytesIO(b"\xff\xd8\xff\xe0\x00\x10JFIFtestimage"), "proof.jpg"),
+        }
+        if event_id:
+            data["event_id"] = event_id
+        return client.post(
+            "/api/submissions", headers=auth(volunteer_email),
+            data=data, content_type="multipart/form-data",
+        )
+    return _submit

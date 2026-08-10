@@ -1,4 +1,4 @@
-"""Sprint 1 — Events API tests: list, get (by id + slug), create, update, delete + ownership."""
+"""Events API tests: list, get (by id + slug), create, update, delete + ownership."""
 import pytest
 
 

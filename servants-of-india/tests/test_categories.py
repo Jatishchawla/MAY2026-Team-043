@@ -1,4 +1,4 @@
-"""Sprint 1 — Categories API tests (read-only list of the 5 fixed categories)."""
+"""Categories API tests (read-only list of the 5 fixed categories)."""
 
 
 def test_list_categories(client, auth):
