@@ -80,56 +80,55 @@ export default function SubmitProof() {
   const categories = data?.categories || [];
 
   return (
-    <div className="max-w-2xl">
-      <PageHeader title="Submit Proof of Service" subtitle="Upload a photo and describe your work." />
-      <div className="card">
-        <form onSubmit={submit} className="space-y-5">
+    <div className="max-w-2xl space-y-6">
+      <PageHeader title="Submit Seva Proof" subtitle="Upload photographic evidence and activity summary for manager verification." />
+      <form onSubmit={submit} className="card space-y-6">
+        <div className="space-y-4">
+          {/* Category selection */}
           <div>
-            <label className="label">Category</label>
+            <label className="label">1. Select Service Pillar</label>
             <div className="grid gap-2 sm:grid-cols-2">
               {categories.map((c) => {
-                const done = c.status === "completed";
-                const pending = c.status === "pending";
-                const disabled = done || pending;
+                const isSelected = categoryId === c.category_id;
+                const disabled = c.status === "completed" || c.status === "pending";
                 return (
                   <button
                     type="button"
                     key={c.category_id}
                     disabled={disabled}
                     onClick={() => setCategoryId(c.category_id)}
-                    className={`flex items-center justify-between rounded-lg border px-3 py-2.5 text-left text-sm transition ${
-                      categoryId === c.category_id
-                        ? "border-brand-500 bg-brand-50"
-                        : "border-slate-200 hover:border-slate-300"
-                    } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
+                    className={`flex items-center justify-between rounded-xl border p-3 text-left text-sm transition-all duration-150 ${
+                      isSelected
+                        ? "border-emerald-600 bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-400/50"
+                        : "border-emerald-200 bg-white hover:bg-emerald-50 text-slate-800 font-bold"
+                    } ${disabled ? "cursor-not-allowed opacity-40 bg-slate-100" : ""}`}
                   >
-                    <span className="font-medium text-slate-700">{c.category_name}</span>
+                    <span className="truncate pr-2">{c.category_name}</span>
                     {c.status !== "not_started" && <StatusBadge status={c.status} />}
                   </button>
                 );
               })}
             </div>
-            <p className="mt-1.5 text-xs text-slate-400">
-              Completed and pending categories cannot be submitted again.
+            <p className="mt-2 text-xs text-slate-600 font-medium">
+              Note: Categories marked as completed or currently under review cannot be re-submitted.
             </p>
           </div>
 
           {/* Completed events for the chosen category */}
           {categoryId && (
-            <div>
-              <label className="label">Completed event you attended</label>
+            <div className="rounded-xl bg-white/80 p-4 border border-emerald-200">
+              <label className="label">2. Completed Event Attended</label>
               {categoryEvents.length === 0 ? (
-                <p className="rounded-lg bg-slate-50 px-3 py-2.5 text-sm text-slate-500">
-                  No completed events in this category yet. You can submit once an event you
-                  attended is marked completed.
-                </p>
+                <div className="rounded-lg bg-emerald-50 p-3 text-xs font-bold text-emerald-950 border border-emerald-200">
+                  Notice: No completed events found in this category yet. You can submit proof after attending a completed drive.
+                </div>
               ) : (
                 <select
-                  className="input"
+                  className="input font-bold text-slate-900"
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
                 >
-                  <option value="">Select an event…</option>
+                  <option value="">Select the completed event drive…</option>
                   {categoryEvents.map((e) => (
                     <option key={e.id} value={e.id}>
                       {e.title} — {e.city} · {formatDate(e.event_date)}
@@ -140,33 +139,46 @@ export default function SubmitProof() {
             </div>
           )}
 
+          {/* Description */}
           <div>
-            <label className="label">Proof image (JPG/PNG, max 5 MB)</label>
-            <input type="file" accept="image/jpeg,image/png" onChange={onFile} className="input" />
-            {preview && (
-              <img src={preview} alt="preview" className="mt-3 max-h-56 rounded-lg border border-slate-200 object-cover" />
-            )}
-          </div>
-
-          <div>
-            <label className="label">Description</label>
+            <label className="label">3. Activity Report / Summary</label>
             <textarea
-              className="input min-h-[110px]"
+              required
+              rows={4}
+              className="input font-medium text-slate-900"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe what you did, where, and when…"
+              placeholder="Describe your volunteer seva, duties performed, hours spent, and the real community impact created…"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting || (categoryId && categoryEvents.length === 0)}
-            className="btn-accent w-full"
-          >
-            {submitting ? <Spinner /> : "Submit for review"}
-          </button>
-        </form>
-      </div>
+          {/* Image Upload */}
+          <div>
+            <label className="label">4. Geo-Tagged Photographic Proof</label>
+            <input
+              type="file"
+              accept="image/*"
+              required
+              className="input text-xs text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-700 file:px-3 file:py-1 file:text-xs file:font-black file:text-white hover:file:bg-emerald-800"
+              onChange={onFile}
+            />
+            {preview && (
+              <div className="mt-3 overflow-hidden rounded-xl border border-emerald-200 bg-white p-2 shadow-inner">
+                <img src={preview} alt="preview" className="max-h-60 rounded-lg object-contain mx-auto" />
+              </div>
+            )}
+            <p className="mt-1 text-xs text-slate-500 font-medium">JPG, PNG, WEBP up to 5 MB.</p>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={submitting || (categoryId && categoryEvents.length === 0)}
+          className="btn-primary w-full py-3.5 text-base font-black shadow-xl"
+        >
+          {submitting ? <Spinner /> : "Submit Proof for Review"}
+        </button>
+      </form>
     </div>
   );
 }

@@ -6,30 +6,33 @@ import { EmptyState, PageHeader, PageLoader, StatusBadge } from "../../component
 import { formatDateTime } from "../../utils/datetime";
 
 const TABS = [
-  { key: "pending", label: "Pending" },
+  { key: "pending", label: "Pending Review" },
   { key: "approved", label: "Approved" },
   { key: "rejected", label: "Rejected" },
-  { key: "all", label: "All" },
+  { key: "all", label: "All Submissions" },
 ];
 
 export default function ReviewQueue() {
-  const [tab, setTab] = useState("pending");
-  const { data, loading, error } = useAsync(() => submissionApi.queue(tab), [tab]);
+  const [status, setStatus] = useState("pending");
+  const { data: list = [], loading, error } = useAsync(() => submissionApi.queue(status), [status]);
 
   return (
-    <div>
-      <PageHeader title="Review Queue" subtitle="Approve or reject volunteer proof submissions." />
+    <div className="space-y-6">
+      <PageHeader title="Proof Review Queue" subtitle="Verify and approve volunteer proofs across 5 seva pillars." />
 
-      <div className="mb-5 flex gap-1 rounded-lg border border-slate-200 bg-white p-1">
-        {TABS.map((t) => (
+      {/* Filters (Clean Box with Emerald Pill) */}
+      <div className="flex flex-wrap gap-2 rounded-2xl border border-emerald-200 bg-white/90 p-1.5 shadow-sm">
+        {TABS.map((f) => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition ${
-              tab === t.key ? "bg-brand-700 text-white" : "text-slate-600 hover:bg-slate-50"
+            key={f.key}
+            onClick={() => setStatus(f.key)}
+            className={`rounded-xl px-4 py-2 text-xs sm:text-sm font-bold transition-all duration-200 ${
+              status === f.key
+                ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white font-black shadow-md shadow-emerald-900/20"
+                : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-950"
             }`}
           >
-            {t.label}
+            {f.label}
           </button>
         ))}
       </div>
@@ -37,22 +40,43 @@ export default function ReviewQueue() {
       {loading ? (
         <PageLoader />
       ) : error ? (
-        <p className="text-red-600">{error}</p>
-      ) : data.length === 0 ? (
-        <EmptyState title="Nothing here" subtitle={`No ${tab} submissions.`} />
+        <p className="text-red-600 font-bold p-4 rounded-xl bg-red-50 border border-red-200">{error}</p>
+      ) : list.length === 0 ? (
+        <EmptyState
+          title={`No ${status ? status : ""} submissions`}
+          subtitle="Volunteer proof submissions will appear here for review."
+        />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {data.map((s) => (
-            <Link key={s.id} to={`/em/submissions/${s.id}`} className="card flex gap-4 transition hover:shadow-md">
-              <img src={s.image_url} alt="proof" className="h-20 w-20 shrink-0 rounded-lg border border-slate-200 object-cover" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="truncate font-semibold text-brand-900">{s.category_name}</h3>
-                  <StatusBadge status={s.status} />
+        <div className="space-y-3">
+          {list.map((s) => (
+            <Link
+              key={s.id}
+              to={`/em/submissions/${s.id}`}
+              className="card p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:scale-[1.01] transition-all duration-200"
+            >
+              <div className="flex items-center gap-4 min-w-0">
+                <img
+                  src={s.image_url}
+                  alt="proof"
+                  className="h-16 w-16 shrink-0 rounded-xl object-cover border-2 border-emerald-300 bg-emerald-100/50 shadow-sm"
+                />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="badge">{s.category_name}</span>
+                    <span className="text-xs font-bold text-amber-950">by {s.volunteer_name}</span>
+                  </div>
+                  <p className="mt-1 truncate text-sm font-extrabold text-slate-950">{s.description}</p>
+                  <p className="mt-0.5 text-[11px] text-slate-700 font-medium">
+                    Submitted {new Date(s.submitted_at).toLocaleString("en-IN")}
+                  </p>
                 </div>
-                <p className="mt-0.5 text-sm text-slate-500">{s.volunteer_name}</p>
-                <p className="mt-1 line-clamp-2 text-sm text-slate-500">{s.description}</p>
-                <p className="mt-1 text-xs text-slate-400">{formatDateTime(s.submitted_at)} IST</p>
+              </div>
+
+              <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
+                <StatusBadge status={s.status} />
+                <span className="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-lg border border-amber-300 shadow-xs hover:bg-amber-200">
+                  Review Proof →
+                </span>
               </div>
             </Link>
           ))}
@@ -61,3 +85,5 @@ export default function ReviewQueue() {
     </div>
   );
 }
+
+

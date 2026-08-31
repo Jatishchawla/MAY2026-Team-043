@@ -49,31 +49,33 @@ export default function AdminEventManagers() {
       {loading ? (
         <PageLoader />
       ) : error ? (
-        <p className="text-red-600">{error}</p>
+        <p className="text-red-600 font-bold p-4 rounded-xl bg-red-50 border border-red-200">{error}</p>
       ) : data.length === 0 ? (
         <EmptyState title="No event managers yet" action={<button onClick={() => setOpen(true)} className="btn-accent">Create one</button>} />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Organization</th>
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {data.map((u) => (
-                <tr key={u.id}>
-                  <td className="px-4 py-3 font-medium text-slate-700">{u.full_name}</td>
-                  <td className="px-4 py-3 text-slate-500">{u.email}</td>
-                  <td className="px-4 py-3 text-slate-500">{u.organization || "—"}</td>
-                  <td className="px-4 py-3"><StatusBadge status={u.status} /></td>
+        <div className="card overflow-hidden p-0 border border-emerald-300/80 shadow-md">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-emerald-100/90 text-xs font-bold uppercase tracking-wider text-emerald-950 border-b border-emerald-200">
+                <tr>
+                  <th className="px-5 py-3.5">Name</th>
+                  <th className="px-5 py-3.5">Email</th>
+                  <th className="px-5 py-3.5">Organization</th>
+                  <th className="px-5 py-3.5">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-emerald-200/60 bg-transparent">
+                {data.map((u) => (
+                  <tr key={u.id} className="hover:bg-emerald-100/40 transition-colors">
+                    <td className="px-5 py-3.5 font-bold text-slate-950">{u.full_name}</td>
+                    <td className="px-5 py-3.5 text-slate-700 font-medium">{u.email}</td>
+                    <td className="px-5 py-3.5 text-slate-800 font-semibold">{u.organization || "—"}</td>
+                    <td className="px-5 py-3.5"><StatusBadge status={u.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

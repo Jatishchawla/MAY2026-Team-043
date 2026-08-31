@@ -4,43 +4,87 @@
 
 @layer base {
   body {
-    @apply text-slate-800 antialiased;
-    /* Soft light gradient that complements the navy + saffron brand palette. */
-    background: linear-gradient(160deg, #f4f8fd 0%, #eef3fa 45%, #fbf7f0 100%);
+    @apply antialiased text-slate-950 font-sans tracking-normal;
+    /* Soft Mint-Pearl Canvas with subtle warm honey amber & emerald ambient glow */
+    background-color: #f0f7f4;
+    background-image: 
+      radial-gradient(ellipse at 15% 0%, rgba(217, 119, 6, 0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 100%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(245, 158, 11, 0.04) 0%, transparent 60%);
     background-attachment: fixed;
     min-height: 100vh;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #e6f4ed;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d97706;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #b45309;
   }
 }
 
 @layer components {
-  /* Reusable UI primitives */
+  /* Buttons */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition
-      focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-200
+      focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm;
   }
-  .btn-primary {
-    @apply btn bg-brand-700 text-white hover:bg-brand-600 focus:ring-brand-500;
+  
+  /* Primary Action Button (Forest Emerald & Warm Honey Sheen) */
+  .btn-primary, .btn-peacock, .btn-blue, .btn-saffron {
+    @apply btn bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white hover:from-emerald-600 hover:to-teal-600
+      focus:ring-amber-400 font-bold active:scale-[0.98] shadow-md shadow-emerald-950/20;
   }
-  .btn-accent {
-    @apply btn bg-saffron-500 text-white hover:bg-saffron-600 focus:ring-saffron-400;
+
+  /* Secondary / Accent Action (Crisp White Button with Amber Text) */
+  .btn-accent, .btn-secondary {
+    @apply btn bg-white text-amber-950 border border-amber-300 hover:bg-amber-50 hover:border-amber-400
+      focus:ring-amber-400 font-bold active:scale-[0.98] shadow-sm;
   }
+
   .btn-ghost {
-    @apply btn bg-transparent text-slate-600 hover:bg-slate-100;
+    @apply btn bg-white/90 text-slate-950 border border-emerald-300 hover:bg-white hover:border-amber-400 font-bold;
   }
+
+  .btn-success {
+    @apply btn bg-emerald-600 text-white hover:bg-emerald-500 font-bold shadow-md shadow-emerald-950/20;
+  }
+
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-400;
+    @apply btn bg-rose-600 text-white hover:bg-rose-500 font-bold shadow-md shadow-rose-950/20;
   }
+
+  /* Form Inputs */
   .input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm
-      placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500;
+    @apply w-full rounded-xl border border-emerald-300 bg-white px-3.5 py-2.5 text-sm text-slate-950 font-medium
+      placeholder:text-slate-400 focus:border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-sm transition;
   }
+
   .label {
-    @apply mb-1.5 block text-sm font-medium text-slate-700;
+    @apply mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-950;
   }
+
+  /* Soothing Whitish-Green (Mint & Jade) Cards */
   .card {
-    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-card;
+    @apply rounded-2xl border border-emerald-300/80 bg-gradient-to-br from-[#ebf9f1] via-[#ddf5e7] to-[#c7eed6]/70 p-6 shadow-md text-slate-950 transition-all duration-200 hover:shadow-lg hover:border-emerald-400 hover:translate-y-[-1px];
   }
+
+  /* Deep Forest Emerald Hero Card (for Progress to Certificate & Featured Highlights) */
+  .card-hero {
+    @apply rounded-2xl border-2 border-emerald-300/80 bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] p-6 shadow-xl shadow-emerald-950/25 text-white transition-all duration-300 hover:border-amber-300/60 hover:translate-y-[-2px];
+  }
+
+  /* Badges */
   .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase bg-amber-100 text-amber-950 border border-amber-300 shadow-sm;
   }
 }

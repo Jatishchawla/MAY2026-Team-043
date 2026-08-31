@@ -1,4 +1,27 @@
-// Small presentational primitives shared across pages.
+import React from "react";
+
+export function IndianFlagIcon({ className = "h-6 w-9" }) {
+  return (
+    <svg className={`rounded-sm inline-block shadow-sm ${className}`} viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="900" height="200" fill="#FF9933" />
+      <rect y="200" width="900" height="200" fill="#FFFFFF" />
+      <rect y="400" width="900" height="200" fill="#138808" />
+      <circle cx="450" cy="300" r="80" stroke="#000080" strokeWidth="6.5" fill="none" />
+      <circle cx="450" cy="300" r="14" fill="#000080" />
+      {Array.from({ length: 24 }).map((_, i) => (
+        <line
+          key={i}
+          x1="450"
+          y1="300"
+          x2={450 + 78 * Math.cos((i * 15 * Math.PI) / 180)}
+          y2={300 + 78 * Math.sin((i * 15 * Math.PI) / 180)}
+          stroke="#000080"
+          strokeWidth="3.5"
+        />
+      ))}
+    </svg>
+  );
+}
 
 export function Spinner({ className = "" }) {
   return (
@@ -15,58 +38,68 @@ export function Spinner({ className = "" }) {
 
 export function PageLoader() {
   return (
-    <div className="flex items-center justify-center py-24 text-brand-700">
-      <Spinner className="h-8 w-8" />
+    <div className="flex flex-col items-center justify-center py-24 text-emerald-700 gap-3">
+      <Spinner className="h-9 w-9 text-emerald-700" />
+      <p className="text-xs font-bold uppercase tracking-wider text-slate-700">Loading data...</p>
     </div>
   );
 }
 
 export function EmptyState({ title, subtitle, action }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-300 bg-white/50 px-6 py-14 text-center">
-      <p className="text-base font-semibold text-slate-700">{title}</p>
-      {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
-      {action && <div className="mt-5">{action}</div>}
+    <div className="rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/80 py-12 px-6 text-center shadow-sm">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm">
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+      </div>
+      <p className="mt-4 text-lg font-bold text-slate-900">{title}</p>
+      {subtitle && <p className="mt-1 text-sm text-slate-700 max-w-md mx-auto font-medium leading-relaxed">{subtitle}</p>}
+      {action && <div className="mt-6 flex justify-center">{action}</div>}
     </div>
   );
 }
 
 const STATUS_STYLES = {
-  pending: "bg-amber-100 text-amber-700",
-  approved: "bg-emerald-100 text-emerald-700",
-  completed: "bg-emerald-100 text-emerald-700",
-  rejected: "bg-red-100 text-red-700",
-  not_started: "bg-slate-100 text-slate-600",
-  upcoming: "bg-brand-100 text-brand-700",
-  cancelled: "bg-red-100 text-red-700",
-  active: "bg-emerald-100 text-emerald-700",
-  blocked: "bg-red-100 text-red-700",
-  deactivated: "bg-slate-200 text-slate-600",
+  pending: "bg-amber-100 text-amber-950 border-amber-300 font-bold",
+  approved: "bg-emerald-100 text-emerald-950 border-emerald-300 font-bold",
+  completed: "bg-emerald-100 text-emerald-950 border-emerald-300 font-bold",
+  rejected: "bg-rose-100 text-rose-950 border-rose-300 font-bold",
+  not_started: "bg-slate-200 text-slate-900 border-slate-300 font-bold",
+  upcoming: "bg-sky-100 text-sky-950 border-sky-300 font-bold",
+  cancelled: "bg-rose-100 text-rose-950 border-rose-300 font-bold",
+  active: "bg-emerald-100 text-emerald-950 border-emerald-300 font-bold",
+  blocked: "bg-rose-100 text-rose-950 border-rose-300 font-bold",
+  deactivated: "bg-slate-200 text-slate-900 border-slate-300 font-bold",
 };
 
 export function StatusBadge({ status }) {
-  const cls = STATUS_STYLES[status] || "bg-slate-100 text-slate-600";
-  return <span className={`badge ${cls}`}>{String(status).replace(/_/g, " ")}</span>;
+  const cls = STATUS_STYLES[status] || "bg-slate-200 text-slate-900 border-slate-300 font-bold";
+  return (
+    <span className={`badge border ${cls}`}>
+      <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-current" />
+      {String(status).replace(/_/g, " ")}
+    </span>
+  );
 }
 
 export function PageHeader({ title, subtitle, action }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-emerald-200/80 pb-4">
       <div>
-        <h1 className="text-2xl font-bold text-brand-900">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm font-medium text-slate-700">{subtitle}</p>}
       </div>
-      {action}
+      {action && <div className="flex items-center gap-2">{action}</div>}
     </div>
   );
 }
 
-export function StatCard({ label, value, accent = "brand" }) {
-  const ring = accent === "saffron" ? "text-saffron-500" : "text-brand-700";
+export function StatCard({ label, value }) {
   return (
-    <div className="card">
-      <p className="text-sm font-medium text-slate-500">{label}</p>
-      <p className={`mt-2 text-3xl font-bold ${ring}`}>{value}</p>
+    <div className="card flex flex-col justify-between hover:translate-y-[-2px] transition-all">
+      <p className="text-xs font-bold uppercase tracking-wider text-slate-900">{label}</p>
+      <p className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-amber-800">{value}</p>
     </div>
   );
 }

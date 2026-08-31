@@ -11,6 +11,7 @@ import VerifyCertificate from "./pages/public/VerifyCertificate";
 
 // Shared
 import Profile from "./pages/shared/Profile";
+import Pillars from "./pages/shared/Pillars";
 
 // Volunteer pages
 import VolunteerDashboard from "./pages/volunteer/Dashboard";
@@ -62,6 +63,8 @@ export default function App() {
       >
         {/* Shared */}
         <Route path="/profile" element={<Profile />} />
+        <Route path="/pillars" element={<Pillars />} />
+        <Route path="/categories" element={<Pillars />} />
 
         {/* Volunteer */}
         <Route path="/dashboard" element={<ProtectedRoute roles={V}><VolunteerDashboard /></ProtectedRoute>} />

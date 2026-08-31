@@ -24,6 +24,7 @@ export default function Register() {
     e.preventDefault();
     if (form.password.length < 8) {
       toast.error("Password must be at least 8 characters");
+
       return;
     }
     try {
@@ -37,46 +38,44 @@ export default function Register() {
 
   return (
     <AuthLayout
-      title="Create your volunteer account"
-      subtitle="Only volunteers self-register. Managers are added by an admin."
+      title="Create Volunteer Account"
+      subtitle="Join the Servants of Bharat network to participate & earn certificates."
       footer={
         <>
-          Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-brand-700 hover:underline">
-            Sign in
+          Already registered?{" "}
+          <Link to="/login" className="font-black text-white hover:underline">
+            Sign in to your account →
           </Link>
         </>
       }
     >
-      <form onSubmit={submit} className="space-y-4">
+      <form onSubmit={submit} className="space-y-3.5">
         <div>
-          <label className="label">Full name *</label>
-          <input required className="input" value={form.full_name} onChange={update("full_name")} />
-        </div>
-        <div>
-          <label className="label">Email *</label>
-          <input type="email" required className="input" value={form.email} onChange={update("email")} />
+          <label className="label">Full Name</label>
+          <input required className="input" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} placeholder="e.g. Rahul Sharma" />
         </div>
         <div>
-          <label className="label">Password *</label>
-          <input type="password" required className="input" value={form.password} onChange={update("password")} placeholder="Min. 8 characters" />
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="label">Phone *</label>
-            <input required className="input" value={form.phone} onChange={update("phone")} />
-          </div>
-          <div>
-            <label className="label">Location *</label>
-            <input required className="input" value={form.location} onChange={update("location")} />
-          </div>
+          <label className="label">Email Address</label>
+          <input type="email" required className="input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="name@example.com" />
         </div>
         <div>
-          <label className="label">Organization</label>
-          <input className="input" value={form.organization} onChange={update("organization")} />
+          <label className="label">Mobile Number (10 Digits)</label>
+          <input type="tel" required pattern="[0-9]{10}" className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="9876543210" />
         </div>
-        <button type="submit" disabled={loading} className="btn-accent w-full">
-          {loading ? <Spinner /> : "Create account"}
+        <div>
+          <label className="label">Create Password (min. 6 chars)</label>
+          <input type="password" required minLength={6} className="input" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="••••••••" />
+        </div>
+        <div>
+          <label className="label">City / Location *</label>
+          <input required className="input" value={form.location} onChange={update("location")} placeholder="e.g. Bengaluru, KA" />
+        </div>
+        <div>
+          <label className="label">College / Organization (Optional)</label>
+          <input className="input" value={form.organization} onChange={update("organization")} placeholder="e.g. NSS Unit / IIT Delhi" />
+        </div>
+        <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 text-base font-black shadow-lg mt-2">
+          {loading ? <Spinner /> : "Create Volunteer Account"}
         </button>
       </form>
     </AuthLayout>

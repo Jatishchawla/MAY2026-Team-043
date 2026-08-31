@@ -22,7 +22,7 @@ export default function SubmissionDetail() {
     try {
       if (kind === "approve") {
         await submissionApi.approve(id, remarks.trim() || undefined);
-        toast.success("Submission approved");
+        toast.success("Submission approved successfully!");
       } else {
         await submissionApi.reject(id, remarks.trim());
         toast.success("Submission rejected");
@@ -36,57 +36,87 @@ export default function SubmissionDetail() {
   };
 
   if (loading) return <PageLoader />;
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (error) return <p className="text-red-400 font-semibold p-4 rounded-xl bg-red-950/40 border border-red-800">{error}</p>;
 
   const pending = s.status === "pending";
 
   return (
-    <div className="max-w-3xl">
-      <button onClick={() => navigate(-1)} className="btn-ghost mb-4 text-sm">← Back to queue</button>
+    <div className="max-w-3xl space-y-4">
+      <button onClick={() => navigate(-1)} className="btn-ghost text-xs">
+        Back to Review Queue
+      </button>
 
-      <div className="card">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-brand-900">{s.category_name}</h1>
+      <div className="card shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-200/80 pb-4">
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 font-heading">{s.category_name}</h1>
+            <p className="mt-1 text-xs font-semibold text-slate-600">
+              Submitted by <span className="text-slate-900 font-black">{s.volunteer_name}</span> · {formatDateTime(s.submitted_at)} IST
+            </p>
+          </div>
           <StatusBadge status={s.status} />
         </div>
-        <p className="mt-1 text-sm text-slate-500">
-          By <b>{s.volunteer_name}</b> · {formatDateTime(s.submitted_at)} IST
-        </p>
 
-        <img src={s.image_url} alt="proof" className="mt-4 max-h-96 w-full rounded-lg border border-slate-200 object-contain bg-slate-50" />
+        <div className="mt-6">
+          <p className="text-[11px] font-black uppercase tracking-wider text-slate-600 mb-2">Proof Photo</p>
+          <div className="overflow-hidden rounded-2xl border border-emerald-200 bg-white p-2">
+            <img
+              src={s.image_url}
+              alt="proof"
+              className="max-h-96 w-full rounded-xl object-contain mx-auto"
+            />
+          </div>
+        </div>
 
-        <div className="mt-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Description</p>
-          <p className="mt-1 whitespace-pre-line text-slate-700">{s.description}</p>
+        <div className="mt-6 rounded-xl bg-white/80 p-4 border border-emerald-200">
+          <p className="text-[11px] font-black uppercase tracking-wider text-emerald-800">Activity Report / Description</p>
+          <p className="mt-2 whitespace-pre-line text-sm text-slate-800 leading-relaxed font-medium">{s.description}</p>
         </div>
 
         {s.event_title && (
-          <p className="mt-3 text-sm text-slate-500">Linked event: <b>{s.event_title}</b></p>
+          <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 p-3 border border-emerald-200 text-xs text-emerald-950">
+            <span className="font-black text-emerald-800">Linked Event:</span>
+            <span className="font-black text-slate-900">{s.event_title}</span>
+          </div>
         )}
 
         {s.review && !pending && (
-          <div className={`mt-4 rounded-lg px-3 py-2 text-sm ${s.status === "approved" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
-            <b>{s.review.decision === "approved" ? "Approved" : "Rejected"}</b>
-            {s.review.remarks && <> — {s.review.remarks}</>}
-            <span className="block text-xs opacity-70">by {s.review.reviewer_name} on {formatDateTime(s.review.reviewed_at)} IST</span>
+          <div className="mt-6 rounded-xl p-4 border border-emerald-200 bg-white text-sm text-slate-900">
+            <p className="font-black">
+              {s.review.decision === "approved" ? "Approved" : "Rejected"}
+            </p>
+            {s.review.remarks && <p className="mt-1 text-xs text-slate-600">{s.review.remarks}</p>}
+            <p className="mt-2 text-[11px] opacity-70">
+              Reviewed by {s.review.reviewer_name} on {formatDateTime(s.review.reviewed_at)} IST
+            </p>
           </div>
         )}
 
         {pending && (
-          <div className="mt-6 border-t border-slate-100 pt-5">
-            <label className="label">Remarks (required to reject, optional to approve)</label>
+          <div className="mt-6 border-t border-white/20 pt-6">
+            <label className="label">
+              Review Remarks (Required for rejection, optional for approval)
+            </label>
             <textarea
-              className="input min-h-[80px]"
+              className="input min-h-[90px] text-sm text-slate-900"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Reason for rejection, or a note on approval…"
+              placeholder="Add feedback or notes for the volunteer..."
             />
-            <div className="mt-3 flex gap-3">
-              <button onClick={() => act("approve")} disabled={busy} className="btn-primary flex-1">
-                {busy ? <Spinner /> : "Approve"}
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => act("approve")}
+                disabled={busy}
+                className="btn-primary flex-1 py-3 text-sm font-black shadow-lg"
+              >
+                {busy ? <Spinner /> : "Approve Proof"}
               </button>
-              <button onClick={() => act("reject")} disabled={busy} className="btn-danger flex-1">
-                {busy ? <Spinner /> : "Reject"}
+              <button
+                onClick={() => act("reject")}
+                disabled={busy}
+                className="btn-danger flex-1 py-3 text-sm font-black shadow-lg"
+              >
+                {busy ? <Spinner /> : "Reject Proof"}
               </button>
             </div>
           </div>
@@ -95,3 +125,4 @@ export default function SubmissionDetail() {
     </div>
   );
 }
+

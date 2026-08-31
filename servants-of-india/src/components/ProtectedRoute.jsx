@@ -1,10 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-/**
- * Guards routes by auth + role. `roles` is an optional array of allowed roles.
- * Unauthenticated users go to /login; wrong-role users go to their home.
- */
 export default function ProtectedRoute({ roles, children }) {
   const { user, isAuthenticated } = useAuth();
   const location = useLocation();

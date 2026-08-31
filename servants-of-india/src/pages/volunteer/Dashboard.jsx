@@ -16,70 +16,111 @@ export default function VolunteerDashboard() {
   const recent = (subs.data || []).slice(0, 4);
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title={`Namaste, ${user.full_name.split(" ")[0]} 👋`}
-        subtitle="Here's your service journey so far."
+        title={`Namaste, ${user.full_name.split(" ")[0]}`}
+        subtitle="Your journey toward making a lasting community impact across Bharat."
+        action={
+          <div className="flex gap-2">
+            <Link to="/events" className="btn-primary text-xs sm:text-sm">
+              Browse Events
+            </Link>
+            <Link to="/submit-proof" className="btn-accent text-xs sm:text-sm">
+              Submit Proof
+            </Link>
+          </div>
+        }
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Categories completed" value={`${p.stars} / ${p.total_categories}`} accent="saffron" />
-        <StatCard label="Total submissions" value={subs.data?.length ?? "—"} />
-        <StatCard label="Unread notifications" value={notes.data?.unread_count ?? "—"} />
+        <StatCard
+          label="Pillars Completed"
+          value={`${p.stars} / ${p.total_categories}`}
+          accent="saffron"
+        />
+        <StatCard
+          label="Total Submissions"
+          value={subs.data?.length ?? 0}
+          accent="blue"
+        />
+        <StatCard
+          label="Unread Alerts"
+          value={notes.data?.unread_count ?? 0}
+          accent="green"
+        />
       </div>
 
-      {/* Progress bar */}
-      <div className="card mt-6">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-brand-900">Progress to certificate</h3>
-          <Link to="/progress" className="text-sm font-semibold text-brand-700 hover:underline">
-            View details
+      {/* Featured Hero Progress Card (Deep Emerald/Teal Jewel Glass with Warm Amber/Gold Highlights) */}
+      <div className="card-hero">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/20 pb-3">
+          <div>
+            <h3 className="font-extrabold text-white text-base">Progress to Official Certificate</h3>
+            <p className="text-xs text-emerald-100 font-medium">Complete verified seva in all 5 pillars to earn your national credential.</p>
+          </div>
+          <Link to="/progress" className="text-xs font-bold text-amber-300 hover:text-white underline">
+            View Seva Breakdown →
           </Link>
         </div>
-        <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-slate-100">
-          <div
-            className="h-full rounded-full bg-saffron-500 transition-all"
-            style={{ width: `${(p.stars / p.total_categories) * 100}%` }}
-          />
+
+        <div className="mt-4">
+          <div className="flex justify-between text-xs font-bold text-white mb-1.5">
+            <span>Overall Seva Completion</span>
+            <span className="font-extrabold text-amber-300">{Math.round((p.stars / p.total_categories) * 100)}%</span>
+          </div>
+          <div className="h-3.5 w-full overflow-hidden rounded-full bg-black/25 p-0.5 border border-white/30">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-white transition-all duration-500 shadow-sm"
+              style={{ width: `${(p.stars / p.total_categories) * 100}%` }}
+            />
+          </div>
         </div>
-        <p className="mt-3 text-sm text-slate-500">
+
+        <div className="mt-4 rounded-xl bg-black/20 p-3.5 border border-white/20 flex items-center justify-between text-xs text-white">
           {p.all_completed ? (
-            <>
-              All categories complete!{" "}
-              <Link to="/certificate" className="font-semibold text-saffron-600 hover:underline">
-                Generate your certificate →
-              </Link>
-            </>
+            <span className="font-extrabold text-amber-300">
+              🎉 All five pillars completed! You are eligible for national certification.
+            </span>
           ) : (
-            `${p.total_categories - p.stars} categor${p.total_categories - p.stars === 1 ? "y" : "ies"} left to complete.`
+            <span className="font-medium text-emerald-100">
+              Only <b className="font-extrabold text-amber-300">{p.total_categories - p.stars} more pillar{p.total_categories - p.stars === 1 ? "" : "s"}</b> needed to earn your certificate.
+            </span>
           )}
-        </p>
+          {p.all_completed && (
+            <Link to="/certificate" className="btn-primary py-1.5 px-3 text-xs font-bold shadow-md">
+              Get Certificate →
+            </Link>
+          )}
+        </div>
       </div>
 
-      {/* Recent submissions */}
-      <div className="card mt-6">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-brand-900">Recent submissions</h3>
-          <Link to="/submit-proof" className="btn-accent text-sm">Submit proof</Link>
+      {/* Recent submissions list (Deep Green Card-Hero) */}
+      <div className="card-hero">
+        <div className="flex items-center justify-between border-b border-white/20 pb-3">
+          <h3 className="text-base font-extrabold text-white">Recent Proof Submissions</h3>
+          <Link to="/my-submissions" className="text-xs font-bold text-amber-300 hover:text-white underline">
+            View All →
+          </Link>
         </div>
+
         {recent.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-500">No submissions yet.</p>
+          <p className="mt-4 text-xs font-semibold text-emerald-100 text-center py-6">
+            No submissions yet. Participate in drives and upload your seva proofs!
+          </p>
         ) : (
-          <ul className="mt-4 divide-y divide-slate-100">
+          <div className="mt-3 divide-y divide-white/15">
             {recent.map((s) => (
-              <li key={s.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-sm font-semibold text-slate-700">{s.category_name}</p>
-                  <p className="text-xs text-slate-400">
-                    {new Date(s.submitted_at).toLocaleDateString()}
-                  </p>
+              <div key={s.id} className="flex items-center justify-between py-3">
+                <div className="min-w-0 flex-1 pr-3">
+                  <p className="truncate text-sm font-bold text-white">{s.category_name}</p>
+                  <p className="mt-0.5 truncate text-xs text-emerald-100 font-medium">{s.description}</p>
                 </div>
                 <StatusBadge status={s.status} />
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
   );
 }
+

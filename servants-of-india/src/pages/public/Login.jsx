@@ -12,11 +12,13 @@ export default function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
 
+  const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
   const submit = async (e) => {
     e.preventDefault();
     try {
       const user = await login(form.email, form.password);
-      toast.success(`Welcome back, ${user.full_name.split(" ")[0]}!`);
+      toast.success(`Welcome back, ${user.full_name ? user.full_name.split(" ")[0] : "Volunteer"}!`);
       navigate(homeForRole(user.role), { replace: true });
     } catch (err) {
       toast.error(err.message);
@@ -25,27 +27,28 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Sign in"
-      subtitle="Welcome back. Enter your credentials to continue."
+      title="Welcome to Portal"
+      subtitle="Sign in with your registered volunteer or manager credentials."
       footer={
         <>
-          New here?{" "}
-          <Link to="/register" className="font-semibold text-brand-700 hover:underline">
-            Create a volunteer account
+          New to Servants of Bharat?{" "}
+          <Link to="/register" className="font-bold text-slate-950 hover:underline">
+            Register as a volunteer →
           </Link>
         </>
       }
     >
       <form onSubmit={submit} className="space-y-4">
         <div>
-          <label className="label">Email</label>
+          <label className="label">Registered Email</label>
           <input
             type="email"
             required
+            autoComplete="email"
             className="input"
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            placeholder="you@example.com"
+            onChange={update("email")}
+            placeholder="name@example.com"
           />
         </div>
         <div>
@@ -53,14 +56,19 @@ export default function Login() {
           <input
             type="password"
             required
+            autoComplete="current-password"
             className="input"
             value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            onChange={update("password")}
             placeholder="••••••••"
           />
         </div>
-        <button type="submit" disabled={loading} className="btn-primary w-full">
-          {loading ? <Spinner /> : "Sign in"}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary w-full py-3.5 text-base font-bold shadow-lg mt-2"
+        >
+          {loading ? <Spinner /> : "Sign In to Portal"}
         </button>
       </form>
     </AuthLayout>

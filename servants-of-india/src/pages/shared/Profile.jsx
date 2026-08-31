@@ -33,7 +33,7 @@ export default function Profile() {
       const updated = await userApi.updateMe(form);
       // Refresh cached user for the navbar name.
       localStorage.setItem("sob_user", JSON.stringify({ ...user, ...updated }));
-      toast.success("Profile updated");
+      toast.success("Profile updated successfully!");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -44,39 +44,45 @@ export default function Profile() {
   if (loading || !form) return <PageLoader />;
 
   return (
-    <div className="max-w-2xl">
-      <PageHeader title="My Profile" subtitle="Manage your account details." />
-      <div className="card">
+    <div className="max-w-2xl space-y-6">
+      <PageHeader title="My Account Profile" subtitle="View and update your personal seva details." />
+
+      <div className="card shadow-xl">
         <form onSubmit={save} className="space-y-4">
           <div>
-            <label className="label">Email (cannot be changed)</label>
-            <input className="input bg-slate-50" value={data.email} disabled />
+            <label className="label">Registered Email</label>
+            <input className="input bg-slate-100 text-slate-500 font-medium cursor-not-allowed" value={data.email} disabled />
+            <p className="mt-1 text-[11px] text-slate-500 font-medium">Email is linked to your account credentials and cannot be modified.</p>
           </div>
           <div>
-            <label className="label">Full name</label>
-            <input required className="input" value={form.full_name} onChange={update("full_name")} />
+            <label className="label">Full Name</label>
+            <input required className="input font-bold text-slate-900" value={form.full_name} onChange={update("full_name")} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="label">Phone</label>
-              <input className="input" value={form.phone} onChange={update("phone")} />
+              <label className="label">Contact Phone</label>
+              <input className="input font-bold text-slate-900" value={form.phone} onChange={update("phone")} />
             </div>
             <div>
-              <label className="label">Location</label>
-              <input className="input" value={form.location} onChange={update("location")} />
+              <label className="label">Location / City</label>
+              <input className="input font-bold text-slate-900" value={form.location} onChange={update("location")} />
             </div>
           </div>
           <div>
-            <label className="label">Organization</label>
-            <input className="input" value={form.organization} onChange={update("organization")} />
+            <label className="label">College / Organization</label>
+            <input className="input font-bold text-slate-900" value={form.organization} onChange={update("organization")} />
           </div>
-          <div className="flex justify-between border-t border-slate-100 pt-4 text-sm text-slate-500">
-            <span>Role: <b className="capitalize text-slate-700">{data.role.replace("_", " ")}</b></span>
-            <span>Joined: {formatDate(data.created_at)}</span>
+
+          <div className="mt-6 rounded-xl bg-white/80 p-3 text-xs text-slate-700 border border-emerald-200 flex items-center justify-between">
+            <span>Account Role: <b className="capitalize text-emerald-800 font-black">{data.role.replace("_", " ")}</b></span>
+            <span>Joined: {new Date(data.created_at).toLocaleDateString("en-IN")}</span>
           </div>
-          <button type="submit" disabled={saving} className="btn-primary">
-            {saving ? <Spinner /> : "Save changes"}
-          </button>
+
+          <div className="pt-2">
+            <button type="submit" disabled={saving} className="btn-primary py-2.5 px-6 font-black shadow-lg">
+              {saving ? <Spinner /> : "Save Profile Changes"}
+            </button>
+          </div>
         </form>
       </div>
 
@@ -101,7 +107,7 @@ function ChangePassword() {
         current_password: form.current_password,
         new_password: form.new_password,
       });
-      toast.success("Password updated");
+      toast.success("Password updated successfully!");
       setForm({ current_password: "", new_password: "", confirm: "" });
     } catch (err) {
       toast.error(err.message);
@@ -111,28 +117,31 @@ function ChangePassword() {
   };
 
   return (
-    <div className="card mt-6">
-      <h2 className="text-lg font-semibold text-brand-900">Change password</h2>
-      <p className="mt-1 text-sm text-slate-500">Choose a strong password of at least 8 characters.</p>
+    <div className="card shadow-xl">
+      <h2 className="text-lg font-black text-slate-900 font-heading">Security & Password</h2>
+      <p className="mt-1 text-xs text-slate-600 font-medium">Update your secret password (minimum 8 characters).</p>
       <form onSubmit={submit} className="mt-4 space-y-4">
         <div>
-          <label className="label">Current password *</label>
-          <input type="password" required className="input" value={form.current_password} onChange={update("current_password")} />
+          <label className="label">Current Password *</label>
+          <input type="password" required className="input text-slate-900" value={form.current_password} onChange={update("current_password")} placeholder="••••••••" />
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="label">New password *</label>
-            <input type="password" required className="input" value={form.new_password} onChange={update("new_password")} placeholder="Min. 8 characters" />
+            <label className="label">New Password *</label>
+            <input type="password" required className="input text-slate-900" value={form.new_password} onChange={update("new_password")} placeholder="Min. 8 characters" />
           </div>
           <div>
-            <label className="label">Confirm new password *</label>
-            <input type="password" required className="input" value={form.confirm} onChange={update("confirm")} />
+            <label className="label">Confirm New Password *</label>
+            <input type="password" required className="input text-slate-900" value={form.confirm} onChange={update("confirm")} placeholder="••••••••" />
           </div>
         </div>
-        <button type="submit" disabled={saving} className="btn-primary">
-          {saving ? <Spinner /> : "Update password"}
-        </button>
+        <div className="pt-2">
+          <button type="submit" disabled={saving} className="btn-primary py-2.5 px-6 font-black shadow-lg">
+            {saving ? <Spinner /> : "Update Password"}
+          </button>
+        </div>
       </form>
     </div>
   );
 }
+

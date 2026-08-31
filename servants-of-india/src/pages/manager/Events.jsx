@@ -97,40 +97,42 @@ export default function EmEvents() {
       ) : events.data.length === 0 ? (
         <EmptyState title="No events yet" action={<button onClick={openCreate} className="btn-accent">Create your first event</button>} />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Title</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">City</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {events.data.map((e) => (
-                <tr key={e.id} className="cursor-pointer hover:bg-slate-50" onClick={() => setViewing(e)}>
-                  <td className="px-4 py-3 font-medium text-brand-800 hover:underline">{e.title}</td>
-                  <td className="px-4 py-3 text-slate-500">{e.category_name}</td>
-                  <td className="px-4 py-3 text-slate-500">{formatDate(e.event_date)}</td>
-                  <td className="px-4 py-3 text-slate-500">{e.city}</td>
-                  <td className="px-4 py-3"><StatusBadge status={e.status} /></td>
-                  <td className="px-4 py-3 text-right" onClick={(ev) => ev.stopPropagation()}>
-                    {canModify(e) ? (
-                      <div className="flex justify-end gap-2">
-                        <button onClick={() => openEdit(e)} className="text-brand-700 hover:underline">Edit</button>
-                        <button onClick={() => setToDelete(e)} className="text-red-600 hover:underline">Delete</button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-slate-300">—</span>
-                    )}
-                  </td>
+        <div className="card overflow-hidden p-0 border border-emerald-300/80 shadow-md">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-emerald-100/90 text-xs font-bold uppercase tracking-wider text-emerald-950 border-b border-emerald-200">
+                <tr>
+                  <th className="px-5 py-3.5">Title</th>
+                  <th className="px-5 py-3.5">Category</th>
+                  <th className="px-5 py-3.5">Date</th>
+                  <th className="px-5 py-3.5">City</th>
+                  <th className="px-5 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-emerald-200/60 bg-transparent">
+                {events.data.map((e) => (
+                  <tr key={e.id} className="cursor-pointer hover:bg-emerald-100/40 transition-colors" onClick={() => setViewing(e)}>
+                    <td className="px-5 py-3.5 font-bold text-slate-950 hover:text-amber-800">{e.title}</td>
+                    <td className="px-5 py-3.5 text-slate-800 font-semibold">{e.category_name}</td>
+                    <td className="px-5 py-3.5 text-slate-700 font-medium">{formatDate(e.event_date)}</td>
+                    <td className="px-5 py-3.5 text-slate-700 font-medium">{e.city}</td>
+                    <td className="px-5 py-3.5"><StatusBadge status={e.status} /></td>
+                    <td className="px-5 py-3.5 text-right" onClick={(ev) => ev.stopPropagation()}>
+                      {canModify(e) ? (
+                        <div className="flex justify-end gap-3 text-xs font-bold">
+                          <button onClick={() => openEdit(e)} className="text-amber-800 hover:text-amber-950 hover:underline">Edit</button>
+                          <button onClick={() => setToDelete(e)} className="text-rose-600 hover:text-rose-800 hover:underline">Delete</button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

@@ -67,49 +67,51 @@ export default function AdminUsers() {
       {loading ? (
         <PageLoader />
       ) : error ? (
-        <p className="text-red-600">{error}</p>
+        <p className="text-red-600 font-bold p-4 rounded-xl bg-red-50 border border-red-200">{error}</p>
       ) : visible.length === 0 ? (
         <EmptyState title="No users match these filters" />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {visible.map((u) => (
-                <tr key={u.id} className="cursor-pointer hover:bg-slate-50" onClick={() => setSelected(u)}>
-                  <td className="px-4 py-3 font-medium text-brand-800 hover:underline">{u.full_name}</td>
-                  <td className="px-4 py-3 text-slate-500">{u.email}</td>
-                  <td className="px-4 py-3 text-slate-500">{ROLE_LABEL[u.role]}</td>
-                  <td className="px-4 py-3"><StatusBadge status={u.status} /></td>
-                  <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                    {u.id === me.id ? (
-                      <span className="text-xs text-slate-300">You</span>
-                    ) : (
-                      <div className="flex justify-end gap-2 text-xs">
-                        {u.status !== "active" && (
-                          <button onClick={() => changeStatus(u.id, "active")} className="text-emerald-600 hover:underline">Activate</button>
-                        )}
-                        {u.status !== "blocked" && (
-                          <button onClick={() => changeStatus(u.id, "blocked")} className="text-red-600 hover:underline">Block</button>
-                        )}
-                        {u.status !== "deactivated" && (
-                          <button onClick={() => changeStatus(u.id, "deactivated")} className="text-slate-500 hover:underline">Deactivate</button>
-                        )}
-                      </div>
-                    )}
-                  </td>
+        <div className="card overflow-hidden p-0 border border-emerald-300/80 shadow-md">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-emerald-100/90 text-xs font-bold uppercase tracking-wider text-emerald-950 border-b border-emerald-200">
+                <tr>
+                  <th className="px-5 py-3.5">Name</th>
+                  <th className="px-5 py-3.5">Email</th>
+                  <th className="px-5 py-3.5">Role</th>
+                  <th className="px-5 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-emerald-200/60 bg-transparent">
+                {visible.map((u) => (
+                  <tr key={u.id} className="cursor-pointer hover:bg-emerald-100/40 transition-colors" onClick={() => setSelected(u)}>
+                    <td className="px-5 py-3.5 font-bold text-slate-950 hover:text-amber-800">{u.full_name}</td>
+                    <td className="px-5 py-3.5 text-slate-700 font-medium">{u.email}</td>
+                    <td className="px-5 py-3.5 text-slate-800 font-semibold">{ROLE_LABEL[u.role]}</td>
+                    <td className="px-5 py-3.5"><StatusBadge status={u.status} /></td>
+                    <td className="px-5 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                      {u.id === me.id ? (
+                        <span className="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">You</span>
+                      ) : (
+                        <div className="flex justify-end gap-3 text-xs font-bold">
+                          {u.status !== "active" && (
+                            <button onClick={() => changeStatus(u.id, "active")} className="text-emerald-700 hover:text-emerald-900 hover:underline">Activate</button>
+                          )}
+                          {u.status !== "blocked" && (
+                            <button onClick={() => changeStatus(u.id, "blocked")} className="text-rose-600 hover:text-rose-800 hover:underline">Block</button>
+                          )}
+                          {u.status !== "deactivated" && (
+                            <button onClick={() => changeStatus(u.id, "deactivated")} className="text-slate-600 hover:text-slate-900 hover:underline">Deactivate</button>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
