@@ -81,14 +81,17 @@ export default function SubmitProof() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <PageHeader title="Submit Seva Proof" subtitle="Upload photographic evidence and activity summary for manager verification." />
+      <PageHeader
+        title="Submit Seva Proof"
+        subtitle="Upload photographic evidence and activity summary for manager verification."
+      />
       <form onSubmit={submit} className="card space-y-6">
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Category selection */}
-          <div>
-            <label className="label">1. Select Service Pillar</label>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {categories.map((c) => {
+          <div className="rounded-2xl bg-emerald-50/70 p-4 sm:p-5 border border-emerald-200/80 shadow-xs">
+            <label className="label text-slate-950 font-extrabold text-sm mb-3">1. Select Service Pillar</label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {categories.map((c, i) => {
                 const isSelected = categoryId === c.category_id;
                 const disabled = c.status === "completed" || c.status === "pending";
                 return (
@@ -97,34 +100,43 @@ export default function SubmitProof() {
                     key={c.category_id}
                     disabled={disabled}
                     onClick={() => setCategoryId(c.category_id)}
-                    className={`flex items-center justify-between rounded-xl border p-3 text-left text-sm transition-all duration-150 ${
+                    className={`flex items-center justify-between rounded-xl border p-3.5 text-left text-sm transition-all duration-200 ${
                       isSelected
-                        ? "border-emerald-600 bg-emerald-700 text-white font-black shadow-md ring-2 ring-emerald-400/50"
-                        : "border-emerald-200 bg-white hover:bg-emerald-50 text-slate-800 font-bold"
-                    } ${disabled ? "cursor-not-allowed opacity-40 bg-slate-100" : ""}`}
+                        ? "border-2 border-amber-400 bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] text-white font-extrabold shadow-lg ring-2 ring-amber-400/40 scale-[1.01]"
+                        : "border border-emerald-300/90 bg-gradient-to-br from-[#ebf9f1] via-[#ddf5e7] to-[#c7eed6]/80 text-slate-950 font-bold hover:border-emerald-500 hover:shadow-md hover:translate-y-[-1px]"
+                    } ${disabled ? "cursor-not-allowed opacity-40 grayscale" : ""}`}
                   >
-                    <span className="truncate pr-2">{c.category_name}</span>
+                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs font-black shadow-xs ${
+                        isSelected
+                          ? "bg-amber-400 text-slate-950"
+                          : "bg-amber-100 text-amber-950 border border-amber-300"
+                      }`}>
+                        0{i + 1}
+                      </span>
+                      <span className="truncate font-extrabold">{c.category_name}</span>
+                    </div>
                     {c.status !== "not_started" && <StatusBadge status={c.status} />}
                   </button>
                 );
               })}
             </div>
-            <p className="mt-2 text-xs text-slate-600 font-medium">
-              Note: Categories marked as completed or currently under review cannot be re-submitted.
+            <p className="mt-3 text-xs text-slate-700 font-medium">
+              💡 Categories marked as <b>completed</b> or <b>pending review</b> cannot be re-submitted.
             </p>
           </div>
 
           {/* Completed events for the chosen category */}
           {categoryId && (
-            <div className="rounded-xl bg-white/80 p-4 border border-emerald-200">
-              <label className="label">2. Completed Event Attended</label>
+            <div className="rounded-2xl bg-emerald-50/70 p-4 sm:p-5 border border-emerald-200/80 shadow-xs">
+              <label className="label text-slate-950 font-extrabold text-sm mb-2">2. Completed Event Attended</label>
               {categoryEvents.length === 0 ? (
-                <div className="rounded-lg bg-emerald-50 p-3 text-xs font-bold text-emerald-950 border border-emerald-200">
-                  Notice: No completed events found in this category yet. You can submit proof after attending a completed drive.
+                <div className="rounded-xl bg-amber-50 p-3.5 text-xs font-bold text-amber-950 border border-amber-300">
+                  ⚠️ Notice: No completed events found in this category yet. You can submit proof after participating in a completed drive.
                 </div>
               ) : (
                 <select
-                  className="input font-bold text-slate-900"
+                  className="input font-bold text-slate-950 border-emerald-300 bg-white"
                   value={eventId}
                   onChange={(e) => setEventId(e.target.value)}
                 >
@@ -140,12 +152,12 @@ export default function SubmitProof() {
           )}
 
           {/* Description */}
-          <div>
-            <label className="label">3. Activity Report / Summary</label>
+          <div className="rounded-2xl bg-emerald-50/70 p-4 sm:p-5 border border-emerald-200/80 shadow-xs">
+            <label className="label text-slate-950 font-extrabold text-sm mb-2">3. Activity Report / Summary</label>
             <textarea
               required
               rows={4}
-              className="input font-medium text-slate-900"
+              className="input font-medium text-slate-950 border-emerald-300 bg-white"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe your volunteer seva, duties performed, hours spent, and the real community impact created…"
@@ -153,8 +165,8 @@ export default function SubmitProof() {
           </div>
 
           {/* Image Upload */}
-          <div>
-            <label className="label">4. Geo-Tagged Photographic Proof</label>
+          <div className="rounded-2xl bg-emerald-50/70 p-4 sm:p-5 border border-emerald-200/80 shadow-xs">
+            <label className="label text-slate-950 font-extrabold text-sm mb-2">4. Geo-Tagged Photographic Proof</label>
             <input
               type="file"
               accept="image/*"
@@ -163,20 +175,20 @@ export default function SubmitProof() {
               onChange={onFile}
             />
             {preview && (
-              <div className="mt-3 overflow-hidden rounded-xl border border-emerald-200 bg-white p-2 shadow-inner">
-                <img src={preview} alt="preview" className="max-h-60 rounded-lg object-contain mx-auto" />
+              <div className="mt-3 overflow-hidden rounded-xl border border-emerald-300 bg-white p-2 shadow-sm">
+                <img src={preview} alt="preview" className="max-h-60 rounded-lg object-contain mx-auto shadow-xs" />
               </div>
             )}
-            <p className="mt-1 text-xs text-slate-500 font-medium">JPG, PNG, WEBP up to 5 MB.</p>
+            <p className="mt-2 text-xs text-slate-600 font-medium">Supported formats: JPG, PNG, WEBP up to 5 MB.</p>
           </div>
         </div>
 
         <button
           type="submit"
           disabled={submitting || (categoryId && categoryEvents.length === 0)}
-          className="btn-primary w-full py-3.5 text-base font-black shadow-xl"
+          className="btn-primary w-full py-3.5 text-base font-extrabold shadow-lg"
         >
-          {submitting ? <Spinner /> : "Submit Proof for Review"}
+          {submitting ? <Spinner /> : "Submit Proof for Review →"}
         </button>
       </form>
     </div>
