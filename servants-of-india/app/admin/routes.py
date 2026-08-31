@@ -36,12 +36,15 @@ def stats():
                 "volunteers": User.query.filter_by(role=UserRole.VOLUNTEER).count(),
                 "event_managers": User.query.filter_by(role=UserRole.EVENT_MANAGER).count(),
                 "admins": User.query.filter_by(role=UserRole.SUPER_ADMIN).count(),
+                "super_admins": User.query.filter_by(role=UserRole.SUPER_ADMIN).count(),
+                "active": User.query.filter_by(status=UserStatus.ACTIVE).count(),
                 "blocked": User.query.filter_by(status=UserStatus.BLOCKED).count(),
             },
             "events": Event.query.count(),
             "events_by_status": events_by_status,
             "submissions": submissions_by_status,
             "certificates_issued": Certificate.query.count(),
+            "certificates": Certificate.query.count(),
         }
     else:
         # Event Manager: every count is scoped to the events they created.
