@@ -100,23 +100,31 @@ export default function SubmitProof() {
                     key={c.category_id}
                     disabled={disabled}
                     onClick={() => setCategoryId(c.category_id)}
-                    className={`flex items-center justify-between rounded-xl border p-3.5 text-left text-sm transition-all duration-200 ${
+                    className={`flex items-center justify-between rounded-xl p-4 text-left text-sm transition-all duration-200 ${
                       isSelected
-                        ? "border-2 border-amber-400 bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] text-white font-extrabold shadow-lg ring-2 ring-amber-400/40 scale-[1.01]"
-                        : "border border-emerald-300/90 bg-gradient-to-br from-[#ebf9f1] via-[#ddf5e7] to-[#c7eed6]/80 text-slate-950 font-bold hover:border-emerald-500 hover:shadow-md hover:translate-y-[-1px]"
-                    } ${disabled ? "cursor-not-allowed opacity-40 grayscale" : ""}`}
+                        ? "bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] text-white font-extrabold shadow-xl border-2 border-amber-300 ring-2 ring-amber-400/60 scale-[1.02]"
+                        : "bg-gradient-to-br from-[#064e3b] via-[#047857] to-[#0f766e] text-white font-bold border border-emerald-600/60 shadow-md hover:border-amber-300 hover:shadow-lg hover:scale-[1.01]"
+                    } ${disabled ? "cursor-not-allowed opacity-45 grayscale bg-slate-800 text-slate-300" : ""}`}
                   >
-                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs font-black shadow-xs ${
+                    <div className="flex items-center gap-3 min-w-0 pr-2">
+                      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-black shadow-xs ${
                         isSelected
-                          ? "bg-amber-400 text-slate-950"
-                          : "bg-amber-100 text-amber-950 border border-amber-300"
+                          ? "bg-amber-400 text-slate-950 ring-2 ring-amber-200"
+                          : "bg-amber-400/25 text-amber-300 border border-amber-300/40"
                       }`}>
                         0{i + 1}
                       </span>
-                      <span className="truncate font-extrabold">{c.category_name}</span>
+                      <span className="truncate font-extrabold text-white text-sm tracking-wide">
+                        {c.category_name}
+                      </span>
                     </div>
-                    {c.status !== "not_started" && <StatusBadge status={c.status} />}
+                    {c.status !== "not_started" ? (
+                      <StatusBadge status={c.status} />
+                    ) : isSelected ? (
+                      <span className="text-[11px] font-black uppercase tracking-wider text-amber-300 bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-400/50">
+                        Selected ✓
+                      </span>
+                    ) : null}
                   </button>
                 );
               })}
