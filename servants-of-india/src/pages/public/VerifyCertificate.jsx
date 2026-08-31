@@ -51,7 +51,6 @@ export default function VerifyCertificate() {
                         : "—"
                     }
                   />
-                  <Row label="Verification Status" value="100% Cryptographically Verified" isSuccess />
                 </dl>
               </div>
             ) : (
